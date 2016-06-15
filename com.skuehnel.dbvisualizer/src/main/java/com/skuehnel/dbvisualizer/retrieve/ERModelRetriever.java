@@ -186,10 +186,8 @@ public class ERModelRetriever {
 					|| type.equals(JDBCType.FLOAT)
 					|| type.equals(JDBCType.REAL)
 					|| type.equals(JDBCType.NUMERIC)) {
-				buffer.append("(");
-				buffer.append(size); 
-				int decimalDigits = columnResultSet.getInt("DECIMAL_DIGITS");
-				buffer.append(",");
+				buffer.append("(");				 
+				int decimalDigits = columnResultSet.getInt("DECIMAL_DIGITS");				
 				buffer.append(decimalDigits);
 				buffer.append(")");
 			} 
