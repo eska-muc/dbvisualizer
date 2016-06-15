@@ -31,4 +31,4 @@ All command line options are listed, like this:
 
 The output file is in the .dot-format of [GraphViz](http://www.graphviz.org). To generate a .pdf-file just type
    
-   dot -Tpdf <outputfile of DBVisualizer> > diagram.pdf
+   dot -Tpdf &lt;outputfile of DBVisualizer&gt; &gt; diagram.pdf
