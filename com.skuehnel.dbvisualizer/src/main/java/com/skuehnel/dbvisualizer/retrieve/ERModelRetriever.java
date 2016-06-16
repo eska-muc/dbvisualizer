@@ -62,8 +62,8 @@ public class ERModelRetriever {
 		if (databaseMetaData != null) {
 			ResultSet schemaResultSet = databaseMetaData.getSchemas();
 			if (schemaResultSet != null) {
-				schemaResultSet.beforeFirst();
-				while (schemaResultSet.next()) {
+				schemaResultSet.first();
+				while (!schemaResultSet.isAfterLast()) {
 					String catalog = schemaResultSet.getString("TABLE_CATALOG");
 					String schema = schemaResultSet.getString("TABLE_SCHEM");
 					LOGGER.debug(
@@ -71,7 +71,9 @@ public class ERModelRetriever {
 							catalog, schema);
 					List<Table> tablesForSchema = getTables(databaseMetaData,catalog,schema);
 					result.addAll(tablesForSchema);
+					schemaResultSet.next();
 				}
+				schemaResultSet.close();
 			}
 
 		}
@@ -82,8 +84,7 @@ public class ERModelRetriever {
 		List<Table> tablesForSchema = new ArrayList<>();
 		LOGGER.debug("Retrieving tables for catalog '{}' and schema '{}'",catalog,schema);
 		ResultSet tablesResultSet = databaseMetaData.getTables(catalog, schema, null, TABLE_TYPES);
-		if (tablesResultSet != null) {
-			tablesResultSet.beforeFirst();
+		if (tablesResultSet != null) {			
 			while (tablesResultSet.next()) {
 				String tableName = tablesResultSet.getString("TABLE_NAME");
 				LOGGER.debug("Table: '{}'",tableName);
@@ -93,19 +94,18 @@ public class ERModelRetriever {
 				Map<String,Table> referencedTables = new HashMap<>();
 				
 				ResultSet primaryKeysRS = databaseMetaData.getPrimaryKeys(catalog, schema, tableName);
-				if (primaryKeysRS != null) {
-					primaryKeysRS.beforeFirst();
+				if (primaryKeysRS != null) {					
 					while (primaryKeysRS.next()) {
 						String pkColumnName = primaryKeysRS.getString("COLUMN_NAME");
 						if (pkColumnName!=null) {
 							primaryKeyNames.add(pkColumnName);
-						}
+						}						
 					}
+					primaryKeysRS.close();
 				}			
 				
 				ResultSet importedKeysRS = databaseMetaData.getImportedKeys(catalog, schema, tableName);
-				if (importedKeysRS != null) {
-					importedKeysRS.beforeFirst();
+				if (importedKeysRS != null) {					
 					while (importedKeysRS.next()) {
 						String fkColumnName = importedKeysRS.getString("FKCOLUMN_NAME");
 						String referencedPkColumnName = importedKeysRS.getString("PKCOLUMN_NAME");
@@ -117,16 +117,15 @@ public class ERModelRetriever {
 							LOGGER.debug("FKCOLUMN_NAME: '{}' -> '{}' (PK of referenced table: '{}')",fkColumnName,fkTableName,referencedPkColumnName);
 							Table fkTable = getTable(fkTableCat, fkTableSchema, fkTableName);							
 							referencedTables.put(fkColumnName, fkTable);
-						}
-						
+						}						
 					}
+					importedKeysRS.close();
 				}				
 				
 				// Get the columns for this table
 				List<Column> columns = new ArrayList<Column>();
 				ResultSet columnResultSet = databaseMetaData.getColumns(catalog, schema, tableName, null);
 				if (columnResultSet != null) {
-					columnResultSet.beforeFirst();
 					while (columnResultSet.next()) {
 						String columnName = columnResultSet.getString("COLUMN_NAME");
 						String dataType = getTypeDescription(columnResultSet);
@@ -144,14 +143,17 @@ public class ERModelRetriever {
 							column.setForeignKeyTable(referencedTable);							
 						}
 						
-						columns.add(column);
+						columns.add(column);						
 					}
+					columnResultSet.close();
 				}
+				
 				
 				Table t = getTable(catalog, schema, tableName);
 				t.setColumns(columns);
-				tablesForSchema.add(t);
+				tablesForSchema.add(t);				
 			}
+			tablesResultSet.close();
 		}		
 		return tablesForSchema;
 	}
