@@ -61,17 +61,15 @@ public class ERModelRetriever {
 		DatabaseMetaData databaseMetaData = jdbcConnection.getMetaData();
 		if (databaseMetaData != null) {
 			ResultSet schemaResultSet = databaseMetaData.getSchemas();
-			if (schemaResultSet != null) {
-				schemaResultSet.first();
-				while (!schemaResultSet.isAfterLast()) {
+			if (schemaResultSet != null) {				
+				while (schemaResultSet.next()) {
 					String catalog = schemaResultSet.getString("TABLE_CATALOG");
 					String schema = schemaResultSet.getString("TABLE_SCHEM");
 					LOGGER.debug(
 							"Going to retrieve tables for catalog '{}' and schema '{}'.",
 							catalog, schema);
 					List<Table> tablesForSchema = getTables(databaseMetaData,catalog,schema);
-					result.addAll(tablesForSchema);
-					schemaResultSet.next();
+					result.addAll(tablesForSchema);				
 				}
 				schemaResultSet.close();
 			}
