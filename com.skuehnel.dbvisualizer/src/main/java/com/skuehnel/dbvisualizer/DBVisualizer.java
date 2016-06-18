@@ -35,6 +35,8 @@ public class DBVisualizer {
 	private String jdbcUrl;
 	private String databaseUser;
 	private String databasePassword;
+	private String catalog = null;
+	private String schema;
 	private boolean lROption = false;
 	
 	/**
@@ -58,7 +60,7 @@ public class DBVisualizer {
 		LOGGER.debug("Initializing connection to DB with driver '{}', url '{}' and user '{}'.",jdbcDriver,jdbcUrl,databaseUser);
 		JDBCConnection jdbcConnection = new JDBCConnection(jdbcDriver, jdbcUrl, databaseUser, databasePassword);		
 		ERModelRetriever retrievER = new ERModelRetriever(jdbcConnection.getConnection());
-		List<Table> model = retrievER.getModel();
+		List<Table> model = retrievER.getModel(catalog,schema);
 		Visualizer visualizer = new Visualizer(model);
 		OutputWriter writer = new OutputWriter(outputFileName,visualizer.getDotRepresentation());
 		writer.write();
@@ -87,6 +89,12 @@ public class DBVisualizer {
 			}
 			if (option.equals(OPTS.OPT_ENABLE_LR.getOption())) {
 				lROption = true;
+			}
+			if (option.equals(OPTS.OPT_SCHEMA_NAME.getOption())) {
+				schema = option.getValue();
+			}
+			if (option.equals(OPTS.OPT_CATALOG_NAME.getOption())) {
+				catalog = option.getValue();
 			}
 		}
 		return mandatoriesAssigned==0;

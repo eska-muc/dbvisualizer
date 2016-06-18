@@ -13,11 +13,11 @@ import org.apache.commons.cli.Options;
 public enum OPTS {
 
 	OPT_DIALECT("d", "dialect", false, true,
-			"DB dialect. Possible values are PostgreSQL, MySQL, SQLite"),
+			"DB dialect. Possible values are PostgreSQL, MySQL, SQLite (not implemented yet)"), 
 	OPT_JDBC_URL(
 			"url", "jdbc-url", false, true, "JDBC URL."), 
-	OPT_JDBC_DRV("driver",
-			"jdbc-driver", false, true,
+	OPT_JDBC_DRV(
+			"driver", "jdbc-driver", false, true,
 			"Class name of the JDBC driver. Driver must be in CLASSPATH."), 
 	OPT_ENABLE_LR(
 			"l", "enable-lr", false, false,
@@ -25,12 +25,18 @@ public enum OPTS {
 	OPT_USER(
 			"u", "user", false, true, "User name for database connection"), 
 	OPT_PASSWORD(
-			"p", "password", false, true, "Password for database connection."),
+			"p", "password", false, true, "Password for database connection."), 
 	OPT_NUM_TABLES(
 			"t", "tables", true, true,
 			"TestDBGenerator only: number of tables."), 
-	OPT_OUTPUT_FILE("o",
-			"output-file", true, true, "Name of the output file.");
+	OPT_SCHEMA_NAME("s",
+			"schema", false, true,
+			"Name of the schema to retrvieve tables from. Default: all schemas."),
+	OPT_CATALOG_NAME("c",
+					"catalog", false, true,
+					"Name of the catalog to retrvieve tables from. Default: null."),
+	OPT_OUTPUT_FILE(
+			"o", "output-file", true, true, "Name of the output file.");
 
 	private String shortOpt;
 	private String longOpt;

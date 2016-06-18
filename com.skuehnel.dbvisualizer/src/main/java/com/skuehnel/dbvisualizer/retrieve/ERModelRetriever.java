@@ -33,16 +33,16 @@ public class ERModelRetriever {
 
 	private Connection jdbcConnection;
 
-	private static final String TABLE_TYPES[] = {"TABLE","VIEW"}; 
-	
-	private Map<String,Table> knownTables;
-	
+	private static final String TABLE_TYPES[] = { "TABLE", "VIEW" };
+
+	private Map<String, Table> knownTables;
+
 	
 	/**
 	 * Constructor
 	 * 
 	 * @param jdbcConnection
-	 *            a {@link java.sql.Connection} object
+	 *            a {@link java.sql.Connection} object	  
 	 */
 	public ERModelRetriever(Connection jdbcConnection) {
 		this.jdbcConnection = jdbcConnection;
@@ -52,168 +52,217 @@ public class ERModelRetriever {
 	/**
 	 * Retrieve a list of {@link com.skuehnel.dbvisualizer.domain.Table} objects
 	 * from the database
+     *
+	 * @param catalog Catalog in which the schema(s) for which a model should be created are located. May be null
+	 * @param schema Schema for which the model shall be created
 	 * 
 	 * @return
 	 * @throws SQLException
 	 */
-	public List<Table> getModel() throws SQLException {
+	public List<Table> getModel(String catalog,String schema) throws SQLException {
 		List<Table> result = new ArrayList<>();
 		DatabaseMetaData databaseMetaData = jdbcConnection.getMetaData();
 		if (databaseMetaData != null) {
-			ResultSet schemaResultSet = databaseMetaData.getSchemas();
-			if (schemaResultSet != null) {				
-				while (schemaResultSet.next()) {
-					String catalog = schemaResultSet.getString("TABLE_CATALOG");
-					String schema = schemaResultSet.getString("TABLE_SCHEM");
-					LOGGER.debug(
-							"Going to retrieve tables for catalog '{}' and schema '{}'.",
-							catalog, schema);
-					List<Table> tablesForSchema = getTables(databaseMetaData,catalog,schema);
-					result.addAll(tablesForSchema);				
-				}
-				schemaResultSet.close();
-			}
 
+			if (schema == null) {
+
+				ResultSet schemaResultSet = databaseMetaData.getSchemas();
+				if (schemaResultSet != null) {
+					while (schemaResultSet.next()) {
+						
+						String currentCatalog = null;
+						try {
+						currentCatalog = schemaResultSet
+								.getString("TABLE_CATALOG");
+						} catch (SQLException e) {
+							LOGGER.warn("Problem when trying to read Catalog information. Exception: '{}'",e);
+						}
+						String currentSchema = schemaResultSet
+								.getString("TABLE_SCHEM");
+						LOGGER.debug(
+								"Going to retrieve tables for catalog '{}' and schema '{}'.",
+								catalog, schema);
+						List<Table> tablesForSchema = getTables(
+								databaseMetaData, catalog, schema);
+						result.addAll(tablesForSchema);
+					}
+					schemaResultSet.close();
+				}
+			} else {
+				result.addAll(getTables(databaseMetaData, catalog, schema));
+			}
 		}
 		return result;
 	}
 
-	protected List<Table> getTables(DatabaseMetaData databaseMetaData,String catalog,String schema) throws SQLException {
+	protected List<Table> getTables(DatabaseMetaData databaseMetaData,
+			String catalog, String schema) throws SQLException {
 		List<Table> tablesForSchema = new ArrayList<>();
-		LOGGER.debug("Retrieving tables for catalog '{}' and schema '{}'",catalog,schema);
-		ResultSet tablesResultSet = databaseMetaData.getTables(catalog, schema, null, TABLE_TYPES);
-		if (tablesResultSet != null) {			
+		LOGGER.debug("Retrieving tables for catalog '{}' and schema '{}'",
+				catalog, schema);
+		ResultSet tablesResultSet = databaseMetaData.getTables(catalog, schema,
+				null, TABLE_TYPES);
+		if (tablesResultSet != null) {
 			while (tablesResultSet.next()) {
 				String tableName = tablesResultSet.getString("TABLE_NAME");
-				LOGGER.debug("Table: '{}'",tableName);
-				
-				
+				LOGGER.debug("Table: '{}'", tableName);
+
 				Set<String> primaryKeyNames = new HashSet<>();
-				Map<String,Table> referencedTables = new HashMap<>();
-				
-				ResultSet primaryKeysRS = databaseMetaData.getPrimaryKeys(catalog, schema, tableName);
-				if (primaryKeysRS != null) {					
+				Map<String, Table> referencedTables = new HashMap<>();
+
+				ResultSet primaryKeysRS = databaseMetaData.getPrimaryKeys(
+						catalog, schema, tableName);
+				if (primaryKeysRS != null) {
 					while (primaryKeysRS.next()) {
-						String pkColumnName = primaryKeysRS.getString("COLUMN_NAME");
-						if (pkColumnName!=null) {
+						String pkColumnName = primaryKeysRS
+								.getString("COLUMN_NAME");
+						if (pkColumnName != null) {
 							primaryKeyNames.add(pkColumnName);
-						}						
+						}
 					}
 					primaryKeysRS.close();
-				}			
-				
-				ResultSet importedKeysRS = databaseMetaData.getImportedKeys(catalog, schema, tableName);
-				if (importedKeysRS != null) {					
+				}
+
+				ResultSet importedKeysRS = databaseMetaData.getImportedKeys(
+						catalog, schema, tableName);
+				if (importedKeysRS != null) {
 					while (importedKeysRS.next()) {
-						String fkColumnName = importedKeysRS.getString("FKCOLUMN_NAME");
-						String referencedPkColumnName = importedKeysRS.getString("PKCOLUMN_NAME");
-						
-						if (fkColumnName != null) {							
-							String fkTableCat = importedKeysRS.getString("PKTABLE_CAT");
-							String fkTableSchema = importedKeysRS.getString("PKTABLE_SCHEM");
-							String fkTableName = importedKeysRS.getString("PKTABLE_NAME");
-							LOGGER.debug("FKCOLUMN_NAME: '{}' -> '{}' (PK of referenced table: '{}')",fkColumnName,fkTableName,referencedPkColumnName);
-							Table fkTable = getTable(fkTableCat, fkTableSchema, fkTableName);							
+						String fkColumnName = importedKeysRS
+								.getString("FKCOLUMN_NAME");
+						String referencedPkColumnName = importedKeysRS
+								.getString("PKCOLUMN_NAME");
+
+						if (fkColumnName != null) {
+							String fkTableCat = importedKeysRS
+									.getString("PKTABLE_CAT");
+							String fkTableSchema = importedKeysRS
+									.getString("PKTABLE_SCHEM");
+							String fkTableName = importedKeysRS
+									.getString("PKTABLE_NAME");
+							LOGGER.debug(
+									"FKCOLUMN_NAME: '{}' -> '{}' (PK of referenced table: '{}')",
+									fkColumnName, fkTableName,
+									referencedPkColumnName);
+							Table fkTable = getTable(fkTableCat, fkTableSchema,
+									fkTableName);
 							referencedTables.put(fkColumnName, fkTable);
-						}						
+						}
 					}
 					importedKeysRS.close();
-				}				
-				
+				}
+
 				// Get the columns for this table
 				List<Column> columns = new ArrayList<Column>();
-				ResultSet columnResultSet = databaseMetaData.getColumns(catalog, schema, tableName, null);
+				ResultSet columnResultSet = databaseMetaData.getColumns(
+						catalog, schema, tableName, null);
 				if (columnResultSet != null) {
 					while (columnResultSet.next()) {
-						String columnName = columnResultSet.getString("COLUMN_NAME");
+						String columnName = columnResultSet
+								.getString("COLUMN_NAME");
 						String dataType = getTypeDescription(columnResultSet);
-						boolean nullable = checkBoolea(columnResultSet, "IS_NULLABLE","yes");
-						LOGGER.debug("Column: '{}', Type: '{}'",columnName,dataType);
-						Column column = new Column(columnName,dataType);
+						boolean nullable = checkBoolean(columnResultSet,
+								"IS_NULLABLE", "yes");
+						LOGGER.debug("Column: '{}', Type: '{}'", columnName,
+								dataType);
+						Column column = new Column(columnName, dataType);
 						column.setNotNull(!nullable);
 						if (primaryKeyNames.contains(columnName)) {
-							LOGGER.debug("Column: '{}' is primary key!",columnName);
+							LOGGER.debug("Column: '{}' is primary key!",
+									columnName);
 							column.setPrimaryKey(true);
 						}
 						if (referencedTables.containsKey(columnName)) {
-							Table referencedTable = referencedTables.get(columnName);
-							LOGGER.debug("Column: '{}' is foreign key to table '{}'!",columnName,referencedTable.getName());
-							column.setForeignKeyTable(referencedTable);							
+							Table referencedTable = referencedTables
+									.get(columnName);
+							LOGGER.debug(
+									"Column: '{}' is foreign key to table '{}'!",
+									columnName, referencedTable.getName());
+							column.setForeignKeyTable(referencedTable);
 						}
-						
-						columns.add(column);						
+
+						columns.add(column);
 					}
 					columnResultSet.close();
 				}
-				
-				
+
 				Table t = getTable(catalog, schema, tableName);
 				t.setColumns(columns);
-				tablesForSchema.add(t);				
+				tablesForSchema.add(t);
 			}
 			tablesResultSet.close();
-		}		
+		}
 		return tablesForSchema;
 	}
-	
+
 	/**
 	 * Create a data type description for this column
+	 * 
 	 * @param columnResultSet
 	 * @return
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
-	protected String getTypeDescription(ResultSet columnResultSet) throws SQLException {
+	protected String getTypeDescription(ResultSet columnResultSet)
+			throws SQLException {
 		StringBuffer buffer = new StringBuffer();
-		
-		JDBCType type = JDBCType.valueOf(columnResultSet.getInt("DATA_TYPE"));
-		
+
+		// initialize with a proper value, if type cannot be resolved
+		JDBCType type = JDBCType.OTHER;
+		String typeName = type.getName();
+		int typeValue = columnResultSet.getInt("DATA_TYPE");
+
+		try {
+			type = JDBCType.valueOf(typeValue);
+		} catch (IllegalArgumentException exception) {
+			LOGGER.warn(
+					"Integer constant '{}' does not seem to represent a known JDBCType.",
+					Integer.toString(typeValue));
+		}
+
 		int size = columnResultSet.getInt("COLUMN_SIZE");
 		if (type != null) {
-			buffer.append(type.name());			
-			if (type.equals(JDBCType.CHAR)
-					|| type.equals(JDBCType.VARCHAR) 
-					|| type.equals(JDBCType.LONGNVARCHAR) 
+			buffer.append(type.name());
+			if (type.equals(JDBCType.CHAR) || type.equals(JDBCType.VARCHAR)
+					|| type.equals(JDBCType.LONGNVARCHAR)
 					|| type.equals(JDBCType.LONGVARCHAR)
 					|| type.equals(JDBCType.NCHAR)
-					|| type.equals(JDBCType.NVARCHAR)					
-					) {				
-				buffer.append("(");								
+					|| type.equals(JDBCType.NVARCHAR)) {
+				buffer.append("(");
 				int sizeOctets = columnResultSet.getInt("CHAR_OCTET_LENGTH");
-				buffer.append(sizeOctets);				
+				buffer.append(sizeOctets);
 				buffer.append(")");
-			} else if (type.equals(JDBCType.DECIMAL) 
+			} else if (type.equals(JDBCType.DECIMAL)
 					|| type.equals(JDBCType.DOUBLE)
 					|| type.equals(JDBCType.FLOAT)
 					|| type.equals(JDBCType.REAL)
 					|| type.equals(JDBCType.NUMERIC)) {
-				buffer.append("(");				 
-				int decimalDigits = columnResultSet.getInt("DECIMAL_DIGITS");				
+				buffer.append("(");
+				int decimalDigits = columnResultSet.getInt("DECIMAL_DIGITS");
 				buffer.append(decimalDigits);
 				buffer.append(")");
-			} 
+			}
 		}
 		return buffer.toString();
 	}
-	
-	
+
 	/**
 	 * Factory method for tables; each table shall only be created once
+	 * 
 	 * @param catalog
 	 * @param schema
 	 * @param tableName
 	 * @return
 	 */
-	private Table getTable(String catalog,String schema,String tableName) {
+	private Table getTable(String catalog, String schema, String tableName) {
 		String key = createKey(catalog, schema, tableName);
 		Table t = knownTables.get(key);
 		if (t == null) {
 			t = new Table(key);
-			knownTables.put(key, t);			
+			knownTables.put(key, t);
 		}
 		return t;
 	}
-	
-	private String createKey(String catalog,String schema,String tableName) {
+
+	private String createKey(String catalog, String schema, String tableName) {
 		StringBuilder keyBuilder = new StringBuilder();
 		if (catalog != null) {
 			keyBuilder.append(catalog);
@@ -226,10 +275,11 @@ public class ERModelRetriever {
 		keyBuilder.append(tableName);
 		return keyBuilder.toString();
 	}
-	
-	private boolean checkBoolea(ResultSet rs,String columnName,String comparison) throws SQLException {
+
+	private boolean checkBoolean(ResultSet rs, String columnName,
+			String comparison) throws SQLException {
 		boolean result = false;
-		if (rs!=null && columnName !=null && comparison != null) {
+		if (rs != null && columnName != null && comparison != null) {
 			String stringValue = rs.getString(columnName);
 			if (stringValue != null) {
 				result = stringValue.equalsIgnoreCase(comparison);
@@ -237,5 +287,5 @@ public class ERModelRetriever {
 		}
 		return result;
 	}
-	
+
 }
