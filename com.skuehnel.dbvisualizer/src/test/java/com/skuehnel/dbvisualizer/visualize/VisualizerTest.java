@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.skuehnel.dbvisualizer.domain.Column;
@@ -69,8 +70,7 @@ public class VisualizerTest {
 		Visualizer v = new Visualizer(tables);		
 		String dot = v.getDotRepresentation();		
 		assertNotNull(dot);
-		System.out.println(dot);
-	
+		System.out.println(dot);	
 	}
 	
 	@Test
@@ -79,10 +79,7 @@ public class VisualizerTest {
 		Visualizer v = new Visualizer(tables);		
 		String dot = v.getDotRepresentation();		
 		assertNotNull(dot);
-		System.out.println(dot);
-	
+		System.out.println(dot);	
 	}
-	
-	 
-	
+		 	
 }

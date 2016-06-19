@@ -16,6 +16,7 @@ import com.skuehnel.dbvisualizer.domain.Table;
 import com.skuehnel.dbvisualizer.retrieve.ConnectionException;
 import com.skuehnel.dbvisualizer.retrieve.JDBCConnection;
 import com.skuehnel.dbvisualizer.retrieve.ERModelRetriever;
+import com.skuehnel.dbvisualizer.util.FORMAT;
 import com.skuehnel.dbvisualizer.util.OPTS;
 import com.skuehnel.dbvisualizer.visualize.Visualizer;
 /**
@@ -37,6 +38,7 @@ public class DBVisualizer {
 	private String databasePassword;
 	private String catalog = null;
 	private String schema;
+	private FORMAT outputFormat = FORMAT.DOT;
 	private boolean lROption = false;
 	
 	/**
@@ -62,8 +64,10 @@ public class DBVisualizer {
 		ERModelRetriever retrievER = new ERModelRetriever(jdbcConnection.getConnection());
 		List<Table> model = retrievER.getModel(catalog,schema);
 		Visualizer visualizer = new Visualizer(model);
-		OutputWriter writer = new OutputWriter(outputFileName,visualizer.getDotRepresentation());
-		writer.write();
+		if (outputFormat.equals(FORMAT.DOT)) {		
+			OutputWriter writer = new OutputWriter(outputFileName,visualizer.getDotRepresentation());
+			writer.write();			
+		} 
 	}
 	
 	private boolean assignCommandLineOptions(CommandLine commandLine) {
@@ -95,6 +99,14 @@ public class DBVisualizer {
 			}
 			if (option.equals(OPTS.OPT_CATALOG_NAME.getOption())) {
 				catalog = option.getValue();
+			}
+			if (option.equals(OPTS.OPT_OUTPUT_FORMAT.getOption())) {
+				try {
+					outputFormat = FORMAT.valueOf(option.getValue().toUpperCase());
+					
+				} catch (IllegalArgumentException | NullPointerException e) {
+					LOGGER.warn("Could not parse '{}' as output format. Will use default.",option.getValue());
+				}
 			}
 		}
 		return mandatoriesAssigned==0;

@@ -83,7 +83,7 @@ public class ERModelRetriever {
 								"Going to retrieve tables for catalog '{}' and schema '{}'.",
 								catalog, schema);
 						List<Table> tablesForSchema = getTables(
-								databaseMetaData, catalog, schema);
+								databaseMetaData, currentCatalog, currentSchema);
 						result.addAll(tablesForSchema);
 					}
 					schemaResultSet.close();
@@ -143,6 +143,14 @@ public class ERModelRetriever {
 									"FKCOLUMN_NAME: '{}' -> '{}' (PK of referenced table: '{}')",
 									fkColumnName, fkTableName,
 									referencedPkColumnName);
+							
+							// If catalog/schema information is null, use current catalog/schema
+							if (fkTableSchema == null) {
+								fkTableSchema = schema;
+							}
+							if (fkTableCat == null) {
+								fkTableCat = catalog;
+							}
 							Table fkTable = getTable(fkTableCat, fkTableSchema,
 									fkTableName);
 							referencedTables.put(fkColumnName, fkTable);
@@ -236,8 +244,12 @@ public class ERModelRetriever {
 					|| type.equals(JDBCType.REAL)
 					|| type.equals(JDBCType.NUMERIC)) {
 				buffer.append("(");
-				int decimalDigits = columnResultSet.getInt("DECIMAL_DIGITS");
-				buffer.append(decimalDigits);
+				buffer.append(size);
+				if (columnResultSet.getObject("DECIMAL_DIGITS")!=null) {
+					int fractionalDigits =columnResultSet.getInt("DECIMAL_DIGITS");
+					buffer.append(',');
+					buffer.append(fractionalDigits);
+				}
 				buffer.append(")");
 			}
 		}
