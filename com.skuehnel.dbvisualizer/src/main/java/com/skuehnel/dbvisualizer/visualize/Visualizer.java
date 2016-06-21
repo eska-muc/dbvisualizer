@@ -86,7 +86,7 @@ public class Visualizer {
 	}
 	
 	protected static String makeDotName(String in) {
-		return in.replace("[\\.\\$]","_");
+		return in.replaceAll("([\\.\\$])","_");
 	}
 	
 }

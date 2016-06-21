@@ -81,5 +81,12 @@ public class VisualizerTest {
 		assertNotNull(dot);
 		System.out.println(dot);	
 	}
-		 	
+
+	@Test
+	public void testMakeDotName() {
+		assertEquals("test_abc_123", Visualizer.makeDotName("test.abc$123"));
+		assertEquals("test_abc_123", Visualizer.makeDotName("test$abc$123"));
+		assertEquals("test_abc_123", Visualizer.makeDotName("test$abc_123"));
+		assertEquals("test_abc_123", Visualizer.makeDotName("test.abc_123"));
+	}
 }

@@ -105,7 +105,8 @@ public class ERModelRetriever {
 		if (tablesResultSet != null) {
 			while (tablesResultSet.next()) {
 				String tableName = tablesResultSet.getString("TABLE_NAME");
-				LOGGER.debug("Table: '{}'", tableName);
+				String tableType = tablesResultSet.getString("TABLE_TYPE");
+				LOGGER.debug("Table: '{}' Type: '{}'", tableName,tableType);
 
 				Set<String> primaryKeyNames = new HashSet<>();
 				Map<String, Table> referencedTables = new HashMap<>();
@@ -235,8 +236,7 @@ public class ERModelRetriever {
 					|| type.equals(JDBCType.NCHAR)
 					|| type.equals(JDBCType.NVARCHAR)) {
 				buffer.append("(");
-				int sizeOctets = columnResultSet.getInt("CHAR_OCTET_LENGTH");
-				buffer.append(sizeOctets);
+				buffer.append(size);
 				buffer.append(")");
 			} else if (type.equals(JDBCType.DECIMAL)
 					|| type.equals(JDBCType.DOUBLE)
