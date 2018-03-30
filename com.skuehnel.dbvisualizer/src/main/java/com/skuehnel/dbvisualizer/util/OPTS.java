@@ -34,10 +34,10 @@ public enum OPTS {
 			"Name of the schema to retrvieve tables from. Default: all schemas."),
 	OPT_CATALOG_NAME("c",
 					"catalog", false, true,
-					"Name of the catalog to retrvieve tables from. Default: null."),
+					"Name of the catalog to retrieve tables from. Default: null."),
 	OPT_OUTPUT_FORMAT("f",
 					"format", false, true,
-					"Output format (not supported yet). Possible values: \"png\", \"pdf\", \"svg\" and \"dot\" (default). When \"pdf\", \"png\" or \"svg\" are selected, the rendering will be done internally using graphviz-java (may have some performance impact)."),					
+					"Output format (NOT SUPPORTED YET!). Possible values: \"png\", \"pdf\", \"svg\" and \"dot\" (default). When \"pdf\", \"png\" or \"svg\" are selected, the rendering will be done internally using graphviz-java (may have some performance impact)."),					
 	OPT_OUTPUT_FILE(
 			"o", "output-file", true, true, "Name of the output file.");
 
