@@ -16,6 +16,7 @@ import com.skuehnel.dbvisualizer.domain.Table;
 import com.skuehnel.dbvisualizer.retrieve.ConnectionException;
 import com.skuehnel.dbvisualizer.retrieve.JDBCConnection;
 import com.skuehnel.dbvisualizer.retrieve.ERModelRetriever;
+import com.skuehnel.dbvisualizer.util.DB_DIALECT;
 import com.skuehnel.dbvisualizer.util.FORMAT;
 import com.skuehnel.dbvisualizer.util.OPTS;
 import com.skuehnel.dbvisualizer.visualize.Visualizer;
@@ -39,6 +40,7 @@ public class DBVisualizer {
 	private String catalog = null;
 	private String schema;
 	private FORMAT outputFormat = FORMAT.DOT;
+	private DB_DIALECT dbDialect = DB_DIALECT.MYSQL;
 	private boolean lROption = false;
 	
 	/**
@@ -61,7 +63,7 @@ public class DBVisualizer {
 		}
 		LOGGER.debug("Initializing connection to DB with driver '{}', url '{}' and user '{}'.",jdbcDriver,jdbcUrl,databaseUser);
 		JDBCConnection jdbcConnection = new JDBCConnection(jdbcDriver, jdbcUrl, databaseUser, databasePassword);		
-		ERModelRetriever retrievER = new ERModelRetriever(jdbcConnection.getConnection());
+		ERModelRetriever retrievER = new ERModelRetriever(jdbcConnection.getConnection(),dbDialect);
 		List<Table> model = retrievER.getModel(catalog,schema);
 		Visualizer visualizer = new Visualizer(model);
 		if (outputFormat.equals(FORMAT.DOT)) {		
@@ -100,10 +102,22 @@ public class DBVisualizer {
 			if (option.equals(OPTS.OPT_CATALOG_NAME.getOption())) {
 				catalog = option.getValue();
 			}
+			if (option.equals(OPTS.OPT_DIALECT.getOption())) {
+				try {
+					dbDialect = DB_DIALECT.valueOf(option.getValue().toUpperCase());
+					LOGGER.info("Using {} as DB dialect.",dbDialect.getValue());
+				} catch (IllegalArgumentException | NullPointerException e) {
+					LOGGER.error("Could not parse '{}' as DB dialect.",option.getValue());
+					System.exit(1);
+				}
+			}
 			if (option.equals(OPTS.OPT_OUTPUT_FORMAT.getOption())) {
 				try {
 					outputFormat = FORMAT.valueOf(option.getValue().toUpperCase());
-					
+					if (!outputFormat.hasImplemented()) {
+						LOGGER.error("Output format {} not implemented yet. Sorry for any inconvenience.",option.getValue());
+						System.exit(1);
+					}
 				} catch (IllegalArgumentException | NullPointerException e) {
 					LOGGER.warn("Could not parse '{}' as output format. Will use default.",option.getValue());
 				}
@@ -134,7 +148,7 @@ public class DBVisualizer {
 					"Gets all tables from given database connection and generates a .dot file for an ER-Diagram.");
 
 		} else {
-			DBVisualizer dbVisualizer = new DBVisualizer(commandLine);			
+			new DBVisualizer(commandLine);			
 		}
 	}
 	

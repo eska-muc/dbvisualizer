@@ -6,15 +6,19 @@ package com.skuehnel.dbvisualizer.util;
  *
  */
 public enum DB_DIALECT {
-	OPT_MYSQL("MySQL"),
-	OPT_POSTGRESQL("PostgreSQL"),
-	OPT_H2("H2"),
-	OPT_SQLITE("SQLite");
+	MYSQL("MySQL"),
+	POSTGRESQL("PostgreSQL"),
+	H2("H2"),
+	SQLITE("SQLite");
 	
 	private String value;
 	
 	private DB_DIALECT(String value) {
 		this.value = value;
+	}
+		
+	public String getValue() {
+		return value;
 	}
 	
 }

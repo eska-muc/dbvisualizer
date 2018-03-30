@@ -1,6 +1,5 @@
 package com.skuehnel.dbvisualizer.visualize;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.skuehnel.dbvisualizer.domain.Table;

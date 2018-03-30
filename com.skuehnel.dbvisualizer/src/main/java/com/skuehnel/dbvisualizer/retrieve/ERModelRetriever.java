@@ -12,13 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.JScrollBar;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.skuehnel.dbvisualizer.domain.Column;
 import com.skuehnel.dbvisualizer.domain.Table;
+import com.skuehnel.dbvisualizer.util.DB_DIALECT;
 
 /**
  * Project DBVisualizer
@@ -37,6 +36,7 @@ public class ERModelRetriever {
 
 	private Map<String, Table> knownTables;
 
+	private DB_DIALECT dbDialect = null;
 	
 	/**
 	 * Constructor
@@ -44,8 +44,9 @@ public class ERModelRetriever {
 	 * @param jdbcConnection
 	 *            a {@link java.sql.Connection} object	  
 	 */
-	public ERModelRetriever(Connection jdbcConnection) {
+	public ERModelRetriever(Connection jdbcConnection,DB_DIALECT dbDialect) {
 		this.jdbcConnection = jdbcConnection;
+		this.dbDialect = dbDialect;
 		knownTables = new HashMap<>();
 	}
 
@@ -134,8 +135,12 @@ public class ERModelRetriever {
 								.getString("PKCOLUMN_NAME");
 
 						if (fkColumnName != null) {
-							String fkTableCat = importedKeysRS
+							String fkTableCat = null;
+							if (dbDialect != DB_DIALECT.MYSQL) {
+								// MySQL returns a cat here, even is no catalog is used overall
+								fkTableCat = importedKeysRS
 									.getString("PKTABLE_CAT");
+							}
 							String fkTableSchema = importedKeysRS
 									.getString("PKTABLE_SCHEM");
 							String fkTableName = importedKeysRS
@@ -149,9 +154,9 @@ public class ERModelRetriever {
 							if (fkTableSchema == null) {
 								fkTableSchema = schema;
 							}
-							if (fkTableCat == null) {
+							if (fkTableCat == null) {								
 								fkTableCat = catalog;
-							}
+							} 							
 							Table fkTable = getTable(fkTableCat, fkTableSchema,
 									fkTableName);
 							referencedTables.put(fkColumnName, fkTable);
@@ -216,7 +221,6 @@ public class ERModelRetriever {
 
 		// initialize with a proper value, if type cannot be resolved
 		JDBCType type = JDBCType.OTHER;
-		String typeName = type.getName();
 		int typeValue = columnResultSet.getInt("DATA_TYPE");
 
 		try {

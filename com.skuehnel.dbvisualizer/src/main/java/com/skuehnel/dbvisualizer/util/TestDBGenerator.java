@@ -1,6 +1,5 @@
 package com.skuehnel.dbvisualizer.util;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -16,7 +15,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 
-import com.skuehnel.dbvisualizer.DBVisualizer;
 import com.skuehnel.dbvisualizer.domain.Column;
 import com.skuehnel.dbvisualizer.domain.Table;
 import com.skuehnel.dbvisualizer.visualize.Visualizer;

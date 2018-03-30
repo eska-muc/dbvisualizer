@@ -4,10 +4,8 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.skuehnel.dbvisualizer.domain.Column;
@@ -15,8 +13,6 @@ import com.skuehnel.dbvisualizer.domain.Table;
 import com.skuehnel.dbvisualizer.util.InvalidParamException;
 import com.skuehnel.dbvisualizer.util.TestDBGenerator;
 
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
 
 public class VisualizerTest {
 
