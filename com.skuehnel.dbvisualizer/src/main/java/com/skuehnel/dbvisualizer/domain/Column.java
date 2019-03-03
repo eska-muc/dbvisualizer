@@ -121,7 +121,7 @@ public class Column {
 	}
 
 	/**
-	 * @param foreignKeyTo the foreignKeyTo to set
+	 * @param foreignKeyTable the foreignKeyTo to set
 	 */
 	public void setForeignKeyTable(Table foreignKeyTable) {
 		this.foreignKeyTable = foreignKeyTable;

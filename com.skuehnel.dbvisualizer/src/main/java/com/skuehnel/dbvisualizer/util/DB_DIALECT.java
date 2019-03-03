@@ -9,11 +9,12 @@ public enum DB_DIALECT {
 	MYSQL("MySQL"),
 	POSTGRESQL("PostgreSQL"),
 	H2("H2"),
+	ORACLE("Oracle"),
 	SQLITE("SQLite");
 	
 	private String value;
 	
-	private DB_DIALECT(String value) {
+	DB_DIALECT(String value) {
 		this.value = value;
 	}
 		
