@@ -109,8 +109,8 @@ public class ERModelRetriever {
         return result;
     }
 
-    protected List<Table> getTables(DatabaseMetaData databaseMetaData,
-                                    String catalog, String schema) throws SQLException {
+    private List<Table> getTables(DatabaseMetaData databaseMetaData,
+                                  String catalog, String schema) throws SQLException {
         List<Table> tablesForSchema = new ArrayList<>();
         LOGGER.debug("Retrieving tables for catalog '{}' and schema '{}'",
                 catalog, schema);
@@ -224,13 +224,13 @@ public class ERModelRetriever {
     /**
      * Create a data type description for this column
      *
-     * @param columnResultSet
+     * @param columnResultSet result set of java.sql.DatabaseMetaData#getColumns
      * @return String representation of the data type of the column
      * @throws SQLException if an error occurs
      */
-    protected String getTypeDescription(ResultSet columnResultSet)
+    private String getTypeDescription(ResultSet columnResultSet)
             throws SQLException {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         // initialize with a proper value, if type cannot be resolved
         JDBCType type = JDBCType.OTHER;
@@ -243,9 +243,6 @@ public class ERModelRetriever {
                     "Integer constant '{}' does not seem to represent a known JDBCType.",
                     typeValue);
         }
-
-        String column_def = columnResultSet.getString("COLUMN_DEF");
-        LOGGER.debug("Column def: {}",column_def);
 
         int size = columnResultSet.getInt(COLUMN_SIZE);
         if (type != null) {
@@ -281,7 +278,7 @@ public class ERModelRetriever {
                 }
                 if (columnResultSet.getObject(DECIMAL_DIGITS) != null) {
                     int fractionalDigits = columnResultSet.getInt(DECIMAL_DIGITS);
-                    if (fractionalDigits>0) {
+                    if (fractionalDigits > 0) {
                         buffer.append(',');
                         buffer.append(fractionalDigits);
                     }
@@ -296,8 +293,8 @@ public class ERModelRetriever {
     /**
      * Factory method for tables; each table shall only be created once
      *
-     * @param catalog name of the catalog
-     * @param schema name of the schema
+     * @param catalog   name of the catalog
+     * @param schema    name of the schema
      * @param tableName name of the table
      * @return a Table object
      */
