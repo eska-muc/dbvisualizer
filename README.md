@@ -51,11 +51,11 @@ Tested with PostgreSQL, MySQL and OracleXE 18c.
 
 The output file is in the .dot-format of [GraphViz](http://www.graphviz.org). To generate a .pdf-file just type
    
-    dot -Tpdf &lt;outputfile of DBVisualizer&gt; &gt; diagram.pdf
+    dot -Tpdf -odiagram.pdf <outputfile of DBVisualizer> 
 
 You may also try
 
-    neato -Goverlap=false -Gmodel=subset -Tpdf &lt;outputfile of DBVisualizer&gt; &gt; diagram.pdf
+    neato -Goverlap=false -Gmodel=subset -Tpdf -odiagram.pdf <outputfile of DBVisualizer> 
 
 ## TestDBGenerator
 
