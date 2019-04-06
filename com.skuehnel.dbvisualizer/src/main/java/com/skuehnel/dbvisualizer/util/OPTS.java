@@ -13,7 +13,7 @@ import org.apache.commons.cli.Options;
 public enum OPTS {
 
 	OPT_DIALECT("d", "dialect", false, true,
-			"DB dialect. Possible values are PostgreSQL, MySQL, SQLite (not implemented yet)"), 
+			"DB dialect. Possible values are PostgreSQL, MySQL, Oracle"),
 	OPT_JDBC_URL(
 			"url", "jdbc-url", false, true, "JDBC URL."), 
 	OPT_JDBC_DRV(
@@ -35,9 +35,7 @@ public enum OPTS {
 	OPT_CATALOG_NAME("c",
 					"catalog", false, true,
 					"Name of the catalog to retrieve tables from. Default: null."),
-	OPT_OUTPUT_FORMAT("f",
-					"format", false, true,
-					"Output format (NOT SUPPORTED YET!). Possible values: \"png\", \"pdf\", \"svg\" and \"dot\" (default). When \"pdf\", \"png\" or \"svg\" are selected, the rendering will be done internally using graphviz-java (may have some performance impact)."),					
+	OPT_FILTER("f","filter",false,true,"Regular expression (Java flavor) which is applied on table names"),
 	OPT_OUTPUT_FILE(
 			"o", "output-file", true, true, "Name of the output file.");
 
@@ -47,8 +45,8 @@ public enum OPTS {
 	private boolean hasArg;
 	private String description;
 
-	private OPTS(String shortOpt, String longOpt, boolean mandatory,
-			boolean hasArg, String description) {
+	OPTS(String shortOpt, String longOpt, boolean mandatory,
+		 boolean hasArg, String description) {
 		this.shortOpt = shortOpt;
 		this.longOpt = longOpt;
 		this.hasArg = hasArg;

@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,8 @@ public class ERModelRetriever {
     private Map<String, Table> knownTables;
 
     private DB_DIALECT dbDialect;
+
+    private Pattern filter;
 
     /**
      * Constructor
@@ -109,6 +112,24 @@ public class ERModelRetriever {
         return result;
     }
 
+    /**
+     * Setter. Set the filter for table names.
+     *
+     * @param filter new value for the table name filter pattern
+     */
+    public void setFilter(Pattern filter) {
+        this.filter = filter;
+    }
+
+    /**
+     * Getter. The current filter pattern for table names
+     *
+     * @return the filter pattern for table names
+     */
+    public Pattern getFilter() {
+        return filter;
+    }
+
     private List<Table> getTables(DatabaseMetaData databaseMetaData,
                                   String catalog, String schema) throws SQLException {
         List<Table> tablesForSchema = new ArrayList<>();
@@ -120,98 +141,14 @@ public class ERModelRetriever {
             while (tablesResultSet.next()) {
                 String tableName = tablesResultSet.getString(TABLE_NAME);
                 String tableType = tablesResultSet.getString(TABLE_TYPE);
-                LOGGER.debug("Table: '{}' Type: '{}'", tableName, tableType);
-
-                Set<String> primaryKeyNames = new HashSet<>();
-                Map<String, Table> referencedTables = new HashMap<>();
-
-                ResultSet primaryKeysRS = databaseMetaData.getPrimaryKeys(
-                        catalog, schema, tableName);
-                if (primaryKeysRS != null) {
-                    while (primaryKeysRS.next()) {
-                        String pkColumnName = primaryKeysRS
-                                .getString(COLUMN_NAME);
-                        if (pkColumnName != null) {
-                            primaryKeyNames.add(pkColumnName);
-                        }
-                    }
-                    primaryKeysRS.close();
+                if (filter != null && !filter.matcher(tableName).matches()) {
+                    LOGGER.debug("Table name {} does not match filter.", tableName);
+                    continue;
                 }
-
-                ResultSet importedKeysRS = databaseMetaData.getImportedKeys(
-                        catalog, schema, tableName);
-                if (importedKeysRS != null) {
-                    while (importedKeysRS.next()) {
-                        String fkColumnName = importedKeysRS
-                                .getString(FKCOLUMN_NAME);
-                        String referencedPkColumnName = importedKeysRS
-                                .getString(PKCOLUMN_NAME);
-
-                        if (fkColumnName != null) {
-                            String fkTableCat = null;
-                            if (dbDialect != DB_DIALECT.MYSQL) {
-                                // MySQL returns a cat here, even is no catalog is used overall
-                                fkTableCat = importedKeysRS
-                                        .getString(PKTABLE_CAT);
-                            }
-                            String fkTableSchema = importedKeysRS
-                                    .getString(PKTABLE_SCHEM);
-                            String fkTableName = importedKeysRS
-                                    .getString(PKTABLE_NAME);
-                            LOGGER.debug(
-                                    "FKCOLUMN_NAME: '{}' -> '{}' (PK of referenced table: '{}')",
-                                    fkColumnName, fkTableName,
-                                    referencedPkColumnName);
-
-                            // If catalog/schema information is null, use current catalog/schema
-                            if (fkTableSchema == null) {
-                                fkTableSchema = schema;
-                            }
-                            if (fkTableCat == null) {
-                                fkTableCat = catalog;
-                            }
-                            Table fkTable = getTable(fkTableCat, fkTableSchema,
-                                    fkTableName);
-                            referencedTables.put(fkColumnName, fkTable);
-                        }
-                    }
-                    importedKeysRS.close();
-                }
-
-                // Get the columns for this table
-                List<Column> columns = new ArrayList<>();
-                ResultSet columnResultSet = databaseMetaData.getColumns(
-                        catalog, schema, tableName, null);
-                if (columnResultSet != null) {
-                    while (columnResultSet.next()) {
-                        String columnName = columnResultSet
-                                .getString(COLUMN_NAME);
-                        String dataType = getTypeDescription(columnResultSet);
-                        boolean nullable = checkBoolean(columnResultSet,
-                                "IS_NULLABLE", "yes");
-                        LOGGER.debug("Column: '{}', Type: '{}'", columnName,
-                                dataType);
-                        Column column = new Column(columnName, dataType);
-                        column.setNotNull(!nullable);
-                        if (primaryKeyNames.contains(columnName)) {
-                            LOGGER.debug("Column: '{}' is primary key!",
-                                    columnName);
-                            column.setPrimaryKey(true);
-                        }
-                        if (referencedTables.containsKey(columnName)) {
-                            Table referencedTable = referencedTables
-                                    .get(columnName);
-                            LOGGER.debug(
-                                    "Column: '{}' is foreign key to table '{}'!",
-                                    columnName, referencedTable.getName());
-                            column.setForeignKeyTable(referencedTable);
-                        }
-
-                        columns.add(column);
-                    }
-                    columnResultSet.close();
-                }
-
+                LOGGER.debug("Processing table: '{}' Type: '{}'", tableName, tableType);
+                Set<String> primaryKeyNames = getPrimaryKeysSet(databaseMetaData, catalog, schema, tableName);
+                Map<String, Table> referencedTables = getReferencedTables(databaseMetaData, catalog, schema, tableName);
+                List<Column> columns = getColumns(databaseMetaData, catalog, schema, tableName, primaryKeyNames, referencedTables);
                 Table t = getTable(catalog, schema, tableName);
                 t.setColumns(columns);
                 tablesForSchema.add(t);
@@ -219,6 +156,102 @@ public class ERModelRetriever {
             tablesResultSet.close();
         }
         return tablesForSchema;
+    }
+
+    private List<Column> getColumns(DatabaseMetaData databaseMetaData, String catalog, String schema, String tableName, Set<String> primaryKeyNames, Map<String, Table> referencedTables) throws SQLException {
+        List<Column> columns = new ArrayList<>();
+        ResultSet columnResultSet = databaseMetaData.getColumns(
+                catalog, schema, tableName, null);
+        if (columnResultSet != null) {
+            while (columnResultSet.next()) {
+                String columnName = columnResultSet
+                        .getString(COLUMN_NAME);
+                String dataType = getTypeDescription(columnResultSet);
+                boolean nullable = checkBoolean(columnResultSet,
+                        "IS_NULLABLE", "yes");
+                LOGGER.debug("Column: '{}', Type: '{}'", columnName,
+                        dataType);
+                Column column = new Column(columnName, dataType);
+                column.setNotNull(!nullable);
+                if (primaryKeyNames.contains(columnName)) {
+                    LOGGER.debug("Column: '{}' is primary key!",
+                            columnName);
+                    column.setPrimaryKey(true);
+                }
+                if (referencedTables.containsKey(columnName)) {
+                    Table referencedTable = referencedTables
+                            .get(columnName);
+                    LOGGER.debug(
+                            "Column: '{}' is foreign key to table '{}'!",
+                            columnName, referencedTable.getName());
+                    column.setForeignKeyTable(referencedTable);
+                }
+                columns.add(column);
+            }
+            columnResultSet.close();
+        }
+        return columns;
+    }
+
+    private Map<String, Table> getReferencedTables(DatabaseMetaData databaseMetaData, String catalog, String schema, String tableName) throws SQLException {
+        Map<String, Table> referencedTables = new HashMap<>();
+        ResultSet importedKeysRS = databaseMetaData.getImportedKeys(
+                catalog, schema, tableName);
+        if (importedKeysRS != null) {
+            while (importedKeysRS.next()) {
+                String fkColumnName = importedKeysRS
+                        .getString(FKCOLUMN_NAME);
+                String referencedPkColumnName = importedKeysRS
+                        .getString(PKCOLUMN_NAME);
+
+                if (fkColumnName != null) {
+                    String fkTableCat = null;
+                    if (dbDialect != DB_DIALECT.MYSQL) {
+                        // MySQL returns a cat here, even is no catalog is used overall
+                        fkTableCat = importedKeysRS
+                                .getString(PKTABLE_CAT);
+                    }
+                    String fkTableSchema = importedKeysRS
+                            .getString(PKTABLE_SCHEM);
+                    String fkTableName = importedKeysRS
+                            .getString(PKTABLE_NAME);
+                    LOGGER.debug(
+                            "FKCOLUMN_NAME: '{}' -> '{}' (PK of referenced table: '{}')",
+                            fkColumnName, fkTableName,
+                            referencedPkColumnName);
+
+                    // If catalog/schema information is null, use current catalog/schema
+                    if (fkTableSchema == null) {
+                        fkTableSchema = schema;
+                    }
+                    if (fkTableCat == null) {
+                        fkTableCat = catalog;
+                    }
+                    Table fkTable = getTable(fkTableCat, fkTableSchema,
+                            fkTableName);
+                    referencedTables.put(fkColumnName, fkTable);
+                }
+            }
+            importedKeysRS.close();
+        }
+        return referencedTables;
+    }
+
+    private Set<String> getPrimaryKeysSet(DatabaseMetaData databaseMetaData, String catalog, String schema, String tableName) throws SQLException {
+        ResultSet primaryKeysRS = databaseMetaData.getPrimaryKeys(
+                catalog, schema, tableName);
+        Set<String> primaryKeyNames = new HashSet<>();
+        if (primaryKeysRS != null) {
+            while (primaryKeysRS.next()) {
+                String pkColumnName = primaryKeysRS
+                        .getString(COLUMN_NAME);
+                if (pkColumnName != null) {
+                    primaryKeyNames.add(pkColumnName);
+                }
+            }
+            primaryKeysRS.close();
+        }
+        return primaryKeyNames;
     }
 
     /**
