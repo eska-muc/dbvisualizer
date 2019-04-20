@@ -12,6 +12,7 @@ import java.util.List;
 public class Table {
 
 	private String name;
+	private String simpleName;
 	private List<Column> columns;
 	
 	private List<Table> foreignKeyRelations;
@@ -54,15 +55,34 @@ public class Table {
 		this.columns = columns;
 		updateForeignKeyRelations();
 	}
-	
+
+	/**
+	 * Getter for attribute simpleName
+	 *
+	 * @return current value of field simpleName
+	 */
+	public String getSimpleName() {
+		return simpleName;
+	}
+
+	/**
+	 * Setter for field simpleName
+	 *
+	 * @param simpleName new value
+	 */
+	public void setSimpleName(String simpleName) {
+		this.simpleName = simpleName;
+	}
+
 	/**
 	 * Getter for foreign key relations
-	 * @return
+	 *
+	 * @return list of foreign key realtions
 	 */
 	public List<Table> getForeignKeyRelations() {
 		return foreignKeyRelations;
 	}
-	
+
 	/**
 	 * Update foreign key relations
 	 */

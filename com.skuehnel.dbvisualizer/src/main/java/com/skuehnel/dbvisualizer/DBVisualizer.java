@@ -44,6 +44,7 @@ public class DBVisualizer {
     private FORMAT outputFormat = FORMAT.DOT;
     private DB_DIALECT dbDialect = DB_DIALECT.MYSQL;
     private boolean lROption = false;
+    private boolean entitiesOnly = false;
     private Pattern filter;
 
     /**
@@ -71,6 +72,8 @@ public class DBVisualizer {
         retrievER.setFilter(filter);
         List<Table> model = retrievER.getModel(catalog, schema);
         Visualizer visualizer = new Visualizer(model);
+        visualizer.setLrEnabled(lROption);
+        visualizer.setEntitiesOnly(entitiesOnly);
         if (outputFormat.equals(FORMAT.DOT)) {
             OutputWriter writer = new OutputWriter(outputFileName, visualizer.getDotRepresentation());
             writer.write();
@@ -100,6 +103,9 @@ public class DBVisualizer {
             }
             if (option.equals(OPTS.OPT_ENABLE_LR.getOption())) {
                 lROption = true;
+            }
+            if (option.equals(OPTS.OPT_ENTITIES_ONLY.getOption())) {
+                entitiesOnly = true;
             }
             if (option.equals(OPTS.OPT_SCHEMA_NAME.getOption())) {
                 schema = option.getValue();

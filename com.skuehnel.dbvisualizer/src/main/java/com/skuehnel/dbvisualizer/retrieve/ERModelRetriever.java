@@ -336,6 +336,7 @@ public class ERModelRetriever {
         Table t = knownTables.get(key);
         if (t == null) {
             t = new Table(key);
+            t.setSimpleName(tableName);
             knownTables.put(key, t);
         }
         return t;
