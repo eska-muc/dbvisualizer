@@ -18,8 +18,9 @@ Start DBVisualizer like this:
 
 All command line options are listed, like this:
 
-    usage: DBVisualizer [-c <arg>] [-d <arg>] [-driver <arg>] [-f <arg>] [-l]
-           [-o <arg>] [-p <arg>] [-s <arg>] [-t <arg>] [-u <arg>] [-url <arg>]
+    usage: DBVisualizer [-c <arg>] [-d <arg>] [-driver <arg>] [-e] [-f <arg>]
+           [-l] [-o <arg>] [-p <arg>] [-s <arg>] [-t <arg>] [-u <arg>] [-url
+           <arg>]
     Gets all (matching) tables from given database connection and generates a
     .dot file for an ER-Diagram.
      -c,--catalog <arg>            Name of the catalog to retrieve tables
@@ -28,10 +29,11 @@ All command line options are listed, like this:
                                    MySQL, Oracle
      -driver,--jdbc-driver <arg>   Class name of the JDBC driver. Driver must
                                    be in CLASSPATH.
+     -e,--entities-only            Show entities and relations only in output.
      -f,--filter <arg>             Regular expression (Java flavor) which is
                                    applied on table names
-     -l,--enable-lr                Visualizer only: ranking=LR; graph layout
-                                   from left to right.
+     -l,--enable-lr                Use GraphViz option ranking=LR; Graph
+                                   layout from left to right.
      -o,--output-file <arg>        Name of the output file.
      -p,--password <arg>           Password for database connection.
      -s,--schema <arg>             Name of the schema to retrvieve tables
