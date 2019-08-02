@@ -1,6 +1,6 @@
 ![GitHub](https://img.shields.io/github/license/eska-muc/dbvisualizer.svg)
 # dbvisualizer
-A tool which creates a GraphViz .dot file for a DB schema via JDBC
+A tool which creates an ER-Diagram as a GraphViz .dot file from a database using JDBC metadata retrieval.
 
 ## Compilation
 
