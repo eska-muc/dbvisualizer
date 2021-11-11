@@ -3,7 +3,6 @@ package com.skuehnel.dbvisualizer.visualize;
 import java.util.List;
 
 import com.skuehnel.dbvisualizer.domain.Table;
-import javafx.scene.control.Tab;
 
 /**
  * Create a file in dot language 
