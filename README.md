@@ -1,6 +1,8 @@
 ![GitHub](https://img.shields.io/github/license/eska-muc/dbvisualizer.svg)
-# dbvisualizer
-A tool which creates an ER-Diagram as a GraphViz .dot file from a database using JDBC metadata retrieval.
+[![GitHub forks](https://img.shields.io/github/forks/eska-muc/dbvisualizer)](https://github.com/eska-muc/dbvisualizer/network)
+[![GitHub Org's stars](https://img.shields.io/github/stars/eska-muc/dbvisualizer)](https://github.com/eska-muc/dbvisualizer/stargazers)
+# DBVisualizer
+A tool which creates an ER-Diagram as a GraphViz .dot file (or input file for PlantUML) from a database using JDBC metadata retrieval.
 
 ## Compilation
 
