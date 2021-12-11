@@ -2,6 +2,7 @@ package com.skuehnel.dbvisualizer.util;
 
 public enum FORMAT {
 	DOT("DOT",".dot","The Language of GraphViz; see http://www.graphviz.org",true),
+    PLANT("PLANT", ".txt", "PlantUML ER Diagrams; see https://plantuml.com/ie-diagram", true),
 	PNG("PNG",".png","Portable Network Graphics; see http://libpng.org/pub/png",false),
 	SVG("SVG",".svg","Scalable Vector Graphics; see https://www.w3.org/TR/2003/REC-SVG11-20030114/",false),
 	PDF("PDF",".pdf","Portable Document Format; see https://en.wikipedia.org/wiki/Portable_Document_Format",false),
@@ -22,7 +23,7 @@ public enum FORMAT {
 	
 	/**
 	 * Get description of format
-	 * @return
+     * @return a string
 	 */
 	public String getDescription() {
 		return description;
@@ -30,7 +31,7 @@ public enum FORMAT {
 	
 	/**
 	 * Get the name of this format
-	 * @return
+     * @return a string
 	 */
 	public String getName() {
 		return name;
@@ -38,7 +39,7 @@ public enum FORMAT {
 	
 	/**
 	 * Get the filename extension for this format
-	 * @return
+     * @return a string
 	 */
 	public String getExtension() {
 		return extension;

@@ -6,5 +6,12 @@ public interface TableVisualizer {
      *
      * @return the dot representation of a table
      */
-    String getDotRepresenation();
+    String getDotRepresentation();
+
+    /**
+     * Create a node description for this table in plant uml syntax
+     *
+     * @return the dot representation of a table
+     */
+    String getPlantRepresentation();
 }

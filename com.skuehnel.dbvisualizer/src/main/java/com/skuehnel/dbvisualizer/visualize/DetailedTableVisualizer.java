@@ -26,7 +26,8 @@ public class DetailedTableVisualizer implements TableVisualizer {
      *
      * @return the detailed representation of the current table in GraphViz' dot language
      */
-    public String getDotRepresenation() {
+    @Override
+    public String getDotRepresentation() {
 
         String nodeName = Visualizer.makeDotName(table.getName().toLowerCase());
         StringBuilder builder = new StringBuilder(nodeName);
@@ -61,6 +62,42 @@ public class DetailedTableVisualizer implements TableVisualizer {
         }
         builder.append("</TABLE>>];\n");
 
+        return builder.toString();
+    }
+
+    /**
+     * Entity for Plant UML IE Diagrams
+     *
+     * @return string in plant uml syntax
+     */
+    @Override
+    public String getPlantRepresentation() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("entity \"%s\" as %s {\n", table.getName(), Visualizer.makeDotName(table.getName().toLowerCase())));
+        int pk_count = 0;
+        for (Column column : table.getColumns()) {
+            if (column.isPrimaryKey()) {
+                pk_count++;
+                builder.append(String.format("  *%s : %s\n", column.getName(), column.getType()));
+            }
+        }
+        if (pk_count > 0) {
+            builder.append("  --\n");
+        }
+        for (Column column : table.getColumns()) {
+            if (!column.isPrimaryKey()) {
+                builder.append("  ");
+                if (column.isNotNull()) {
+                    builder.append("*");
+                }
+                builder.append(String.format("%s : %s", column.getName(), column.getType()));
+                if (column.getForeignKeyTable() != null) {
+                    builder.append(" <<FK>>");
+                }
+                builder.append("\n");
+            }
+        }
+        builder.append("}\n");
         return builder.toString();
     }
 

@@ -77,6 +77,9 @@ public class DBVisualizer {
         if (outputFormat.equals(FORMAT.DOT)) {
             OutputWriter writer = new OutputWriter(outputFileName, visualizer.getDotRepresentation());
             writer.write();
+        } else if (outputFormat.equals(FORMAT.PLANT)) {
+            OutputWriter writer = new OutputWriter(outputFileName, visualizer.getPlantRepresentation());
+            writer.write();
         }
     }
 
@@ -112,6 +115,15 @@ public class DBVisualizer {
             }
             if (option.equals(OPTS.OPT_CATALOG_NAME.getOption())) {
                 catalog = option.getValue();
+            }
+            if (option.equals(OPTS.OPT_FORMAT.getOption())) {
+                String format = option.getValue();
+                try {
+                    outputFormat = FORMAT.valueOf(format);
+                } catch (IllegalArgumentException e) {
+                    LOGGER.error("Unknown format {}", format);
+                    System.exit(1);
+                }
             }
             if (option.equals(OPTS.OPT_FILTER.getOption())) {
                 String filterString = option.getValue();
@@ -155,7 +167,7 @@ public class DBVisualizer {
         if (commandLine.getOptions().length == 0) {
             OPTS.printHelp(
                     "DBVisualizer",
-                    "Gets all (matching) tables from given database connection and generates a .dot file for an ER-Diagram.");
+                    "Gets all (matching) tables from given database connection and generates an outputfile in the specified format (default: .dot)");
         } else {
             new DBVisualizer(commandLine);
         }
