@@ -11,7 +11,7 @@ public class SimpleTableVisualizer implements TableVisualizer {
     }
 
     @Override
-    public String getDotRepresenation() {
+    public String getDotRepresentation() {
         String nodeName = Visualizer.makeDotName(table.getName().toLowerCase());
         StringBuilder builder = new StringBuilder(nodeName);
         builder.append("[label=<");
@@ -20,6 +20,12 @@ public class SimpleTableVisualizer implements TableVisualizer {
         builder.append(table.getSimpleName());
         builder.append("</TD></TR></TABLE>");
         builder.append(">];\n");
+        return builder.toString();
+    }
+
+    @Override
+    public String getPlantRepresentation() {
+        StringBuilder builder = new StringBuilder();
         return builder.toString();
     }
 }

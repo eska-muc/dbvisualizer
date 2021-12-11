@@ -88,7 +88,7 @@ public class Visualizer {
 		builder.append("  node [shape=plaintext];\n");
 		for (Table table : tables) {
 			TableVisualizer tv = getTableVisualizer(table);
-			builder.append(tv.getDotRepresenation());
+			builder.append(tv.getDotRepresentation());
 		}
 		for (Table table : tables) {
 			List<Table> foreignKeyRelations = table.getForeignKeyRelations();
@@ -106,7 +106,40 @@ public class Visualizer {
 		builder.append("}\n");		
 		return builder.toString();
 	}
-	
+
+	/**
+	 * Get Output for Plant IE (ER) Diagrams
+	 *
+	 * @return a string describing the database in PlantUML notation
+	 */
+	public String getPlantRepresentation() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("@startuml\n");
+		builder.append("'hide the spot\n");
+		builder.append("hide circle\n");
+		builder.append("' comment\n");
+		builder.append("skinparam linetype ortho\n");
+		for (Table table : tables) {
+			TableVisualizer tv = getTableVisualizer(table);
+			builder.append(tv.getPlantRepresentation());
+			builder.append("\n");
+		}
+		builder.append("\n");
+		for (Table table : tables) {
+			List<Table> foreignKeyRelations = table.getForeignKeyRelations();
+			if (!foreignKeyRelations.isEmpty()) {
+				for (Table other : foreignKeyRelations) {
+					builder.append(Visualizer.makeDotName(table.getName()).toLowerCase());
+					builder.append(" }|--|| ");
+					builder.append(Visualizer.makeDotName(other.getName()).toLowerCase());
+					builder.append("\n");
+				}
+			}
+		}
+		builder.append("@enduml\n");
+		return builder.toString();
+	}
+
 	protected static String makeDotName(String in) {
 		return in.replaceAll("([\\.\\$])", "_");
 	}

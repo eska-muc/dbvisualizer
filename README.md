@@ -16,13 +16,16 @@ Start DBVisualizer like this:
 
     java -jar target/dbvisualizer-1-SNAPSHOT-jar-with-dependencies.jar
 
+It is expected, that the JDBS driver's location is specifief in the classpath.
+
 All command line options are listed, like this:
 
-    usage: DBVisualizer [-c <arg>] [-d <arg>] [-driver <arg>] [-e] [-f <arg>]
-           [-l] [-o <arg>] [-p <arg>] [-s <arg>] [-t <arg>] [-u <arg>] [-url
-           <arg>]
-    Gets all (matching) tables from given database connection and generates a
-    .dot file for an ER-Diagram.
+    usage: DBVisualizer [-a <arg>] [-c <arg>] [-d <arg>] [-driver <arg>] [-e]
+           [-f <arg>] [-l] [-o <arg>] [-p <arg>] [-s <arg>] [-t <arg>] [-u
+           <arg>] [-url <arg>]
+    Gets all (matching) tables from given database connection and generates an
+    outputfile in the specified format (default: .dot)
+     -a,--format <arg>             Format: DOT (default), PLANT
      -c,--catalog <arg>            Name of the catalog to retrieve tables
                                    from. Default: null.
      -d,--dialect <arg>            DB dialect. Possible values are PostgreSQL,
@@ -41,6 +44,7 @@ All command line options are listed, like this:
      -t,--tables <arg>             TestDBGenerator only: number of tables.
      -u,--user <arg>               User name for database connection
      -url,--jdbc-url <arg>         JDBC URL.
+
      
 Tip: For very large schemas it might be useful to apply an filter and generate #
 several smaller diagrams instead of one large.
@@ -51,13 +55,20 @@ Tested with PostgreSQL, MySQL and OracleXE 18c.
 
 ## GraphViz
 
-The output file is in the .dot-format of [GraphViz](http://www.graphviz.org). To generate a .pdf-file just type
+By default the file is in the .dot-format of [GraphViz](http://www.graphviz.org). To generate a .pdf-file just type
    
     dot -Tpdf -odiagram.pdf <outputfile of DBVisualizer> 
 
 You may also try
 
     neato -Goverlap=false -Gmodel=subset -Tpdf -odiagram.pdf <outputfile of DBVisualizer> 
+
+## PlantUML
+
+With option -a PLANT a text file for [PlantUML](https://plantuml.com/ie-diagram) will be generated.
+This can be converted into a .pdf file like this (name of the .jar file can be different):
+
+    java -jar target/plantuml-1.2021.16-SNAPSHOT-jar-with-dependencies.jar -tpdf <path to output of dbvisualizer>
 
 ## TestDBGenerator
 
