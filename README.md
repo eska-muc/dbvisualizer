@@ -4,7 +4,7 @@
 # DBVisualizer
 A tool which creates an ER-Diagram as a GraphViz .dot file (or input file for PlantUML) from a database using JDBC metadata retrieval.
 
-![Example](https://github.com/eska-muc/dbvisualizer/blob/master/com.skuehnel.dbvisualizer/example/postgresql_test.png)
+![Example (generated with PlantUML)](https://github.com/eska-muc/dbvisualizer/blob/master/com.skuehnel.dbvisualizer/example/postgresql_test.png)
 
 ## Compilation
 
