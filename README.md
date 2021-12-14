@@ -98,6 +98,9 @@ Command line options are:
 
 List of some features, which might be added in future:
 
-* run as REST service and provide a web UI, probably using a JS framework like
- [visjs.org](http://visjs.org/) or [D3js](https://d3js.org/) for visualization 
-* generate text reports of the database structure (for documentation purposes) 
+* Add a parameter to specify the path to an JDBC Driver (setting the CLASSPTH as an environment variable is a little bin inconvenient nowadays)
+* generate text reports of the database structure (for documentation purposes)
+* Create a Maven Plugin, so that the Documentation can be easily generated in the build process
+* Check, if [Smetana](https://github.com/plantuml/smetana) could be used as a direct library instead of the GraphViz standalone tools
+* run as REST service and provide a web UI, probably using a JS framework like [visjs.org](http://visjs.org/) or [D3js](https://d3js.org/) for visualization 
+
