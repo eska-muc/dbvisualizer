@@ -6,19 +6,21 @@ import org.apache.commons.cli.Options;
 
 /**
  * Options for DBVisualizer and TestDBgenerator
- * 
- * @author Stefan Kuehnel
  *
+ * @author Stefan Kuehnel
  */
 public enum OPTS {
 
 	OPT_DIALECT("d", "dialect", false, true,
 			"DB dialect. Possible values are PostgreSQL, MySQL, Oracle"),
 	OPT_JDBC_URL(
-			"url", "jdbc-url", false, true, "JDBC URL."), 
+			"url", "jdbc-url", true, true, "JDBC URL (mandatory)."),
 	OPT_JDBC_DRV(
-			"driver", "jdbc-driver", false, true,
-			"Class name of the JDBC driver. Driver must be in CLASSPATH."), 
+			"driver", "jdbc-driver", true, true,
+			"Class name of the JDBC driver (mandatory)."),
+	OPT_JDBC_DRV_PATH(
+			"driverpath", "jdbc-driver-path", false, true,
+			"Path to the driver classes. If this option is not specified, the driver is searched in CLASSPATH."),
 	OPT_ENABLE_LR(
 			"l", "enable-lr", false, false,
 			"Use GraphViz option ranking=LR; Graph layout from left to right."),
@@ -27,33 +29,34 @@ public enum OPTS {
 			"Show entities and relations only in output."),
 	OPT_FORMAT("a", "format", false, true, "Format: DOT (default), PLANT"),
 	OPT_USER(
-			"u", "user", false, true, "User name for database connection"), 
+			"u", "user", false, true, "User name for database connection"),
 	OPT_PASSWORD(
-			"p", "password", false, true, "Password for database connection."), 
+			"p", "password", false, true, "Password for database connection."),
 	OPT_NUM_TABLES(
-			"t", "tables", true, true,
-			"TestDBGenerator only: number of tables."), 
+			"t", "tables", false, true,
+			"TestDBGenerator only: number of tables."),
 	OPT_SCHEMA_NAME("s",
 			"schema", false, true,
-			"Name of the schema to retrvieve tables from. Default: all schemas."),
+			"Name of the schema to retrieve tables from. Default: all schemas."),
 	OPT_CATALOG_NAME("c",
-					"catalog", false, true,
-					"Name of the catalog to retrieve tables from. Default: null."),
-	OPT_FILTER("f","filter",false,true,"Regular expression (Java flavor) which is applied on table names"),
+			"catalog", false, true,
+			"Name of the catalog to retrieve tables from. Default: null."),
+	OPT_FILTER("f", "filter", false, true, "Regular expression (Java flavor) which is applied on table names"),
 	OPT_OUTPUT_FILE(
-			"o", "output-file", true, true, "Name of the output file.");
+			"o", "output-file", true, true, "Name of the output file (mandatory).");
 
-	private String shortOpt;
-	private String longOpt;
-	private boolean mandatory;
-	private boolean hasArg;
-	private String description;
+	private final String shortOpt;
+	private final String longOpt;
+	private final boolean mandatory;
+	private final boolean hasArg;
+	private final String description;
 
 	OPTS(String shortOpt, String longOpt, boolean mandatory,
 		 boolean hasArg, String description) {
 		this.shortOpt = shortOpt;
 		this.longOpt = longOpt;
 		this.hasArg = hasArg;
+		this.mandatory = mandatory;
 		this.description = description;
 	}
 

@@ -24,32 +24,43 @@ It is expected, that the JDBS driver's location is specifief in the classpath.
 
 All command line options are listed, like this:
 
-    usage: DBVisualizer [-a <arg>] [-c <arg>] [-d <arg>] [-driver <arg>] [-e]
-           [-f <arg>] [-l] [-o <arg>] [-p <arg>] [-s <arg>] [-t <arg>] [-u
-           <arg>] [-url <arg>]
+    usage: DBVisualizer [-a <arg>] [-c <arg>] [-d <arg>] -driver <arg>
+       [-driverpath <arg>] [-e] [-f <arg>] [-l] -o <arg> [-p <arg>] [-s
+       <arg>] [-t <arg>] [-u <arg>] -url <arg>
+
     Gets all (matching) tables from given database connection and generates an
     outputfile in the specified format (default: .dot)
-     -a,--format <arg>             Format: DOT (default), PLANT
-     -c,--catalog <arg>            Name of the catalog to retrieve tables
-                                   from. Default: null.
-     -d,--dialect <arg>            DB dialect. Possible values are PostgreSQL,
-                                   MySQL, Oracle
-     -driver,--jdbc-driver <arg>   Class name of the JDBC driver. Driver must
-                                   be in CLASSPATH.
-     -e,--entities-only            Show entities and relations only in output.
-     -f,--filter <arg>             Regular expression (Java flavor) which is
-                                   applied on table names
-     -l,--enable-lr                Use GraphViz option ranking=LR; Graph
-                                   layout from left to right.
-     -o,--output-file <arg>        Name of the output file.
-     -p,--password <arg>           Password for database connection.
-     -s,--schema <arg>             Name of the schema to retrvieve tables
-                                   from. Default: all schemas.
-     -t,--tables <arg>             TestDBGenerator only: number of tables.
-     -u,--user <arg>               User name for database connection
-     -url,--jdbc-url <arg>         JDBC URL.
 
-     
+    -a,--format <arg>                      Format: DOT (default), PLANT
+    -c,--catalog <arg>                     Name of the catalog to retrieve
+    tables from. Default: null.
+    -d,--dialect <arg>                     DB dialect. Possible values are
+    PostgreSQL, MySQL, Oracle
+    -driver,--jdbc-driver <arg>            Class name of the JDBC driver
+    (mandatory).
+    -driverpath,--jdbc-driver-path <arg>   Path to the driver classes. If
+    this option is not specified, the
+    driver is searched in CLASSPATH.
+    -e,--entities-only                     Show entities and relations only
+    in output.
+    -f,--filter <arg>                      Regular expression (Java flavor)
+    which is applied on table names
+    -l,--enable-lr                         Use GraphViz option ranking=LR;
+    Graph layout from left to right.
+    -o,--output-file <arg>                 Name of the output file
+    (mandatory).
+    -p,--password <arg>                    Password for database connection.
+    -s,--schema <arg>                      Name of the schema to retrieve
+    tables from. Default: all schemas.
+    -t,--tables <arg>                      TestDBGenerator only: number of
+    tables.
+    -u,--user <arg>                        User name for database connection
+    -url,--jdbc-url <arg>                  JDBC URL (mandatory).
+
+Example (assuming a PostgreSQL database "test" on localhost, port 5432):
+    
+    java -jar target/dbvisualizer-1-SNAPSHOT-jar-with-dependencies.jar -driverpath ./postgresql-42.3.1.jar -driver org.postgresql.Driver -o postgresql_test.dot -d PostgreSQL -s test -u test -p "test123" -url jdbc:postgresql://localhost:5432/test 
+
 Tip: For very large schemas it might be useful to apply an filter and generate #
 several smaller diagrams instead of one large.
 
@@ -98,7 +109,6 @@ Command line options are:
 
 List of some features, which might be added in future:
 
-* Add a parameter to specify the path to an JDBC Driver (setting the CLASSPTH as an environment variable is a little bin inconvenient nowadays)
 * generate text reports of the database structure (for documentation purposes)
 * Create a Maven Plugin, so that the Documentation can be easily generated in the build process
 * Check, if [Smetana](https://github.com/plantuml/smetana) could be used as a direct library instead of the GraphViz standalone tools

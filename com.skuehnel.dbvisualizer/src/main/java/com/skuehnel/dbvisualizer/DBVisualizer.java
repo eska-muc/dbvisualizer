@@ -2,6 +2,7 @@ package com.skuehnel.dbvisualizer;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -11,6 +12,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +39,7 @@ public class DBVisualizer {
     private String outputFileName;
     private String jdbcDriver;
     private String jdbcUrl;
+    private String jdbcDriverPath;
     private String databaseUser;
     private String databasePassword;
     private String catalog = null;
@@ -66,8 +69,8 @@ public class DBVisualizer {
             System.err.println("One or more of the mandatory options (outputFileName, JDBC Driver class, JDBC URL) is missing.");
             System.exit(1);
         }
-        LOGGER.debug("Initializing connection to DB with driver '{}', url '{}' and user '{}'.", jdbcDriver, jdbcUrl, databaseUser);
-        JDBCConnection jdbcConnection = new JDBCConnection(jdbcDriver, jdbcUrl, databaseUser, databasePassword);
+        LOGGER.debug("Initializing connection to DB with driver '{}', driver path {}, url '{}' and user '{}'.", jdbcDriver, jdbcDriverPath != null ? jdbcDriverPath : "n/a", jdbcUrl, databaseUser);
+        JDBCConnection jdbcConnection = new JDBCConnection(jdbcDriver, jdbcDriverPath, jdbcUrl, databaseUser, databasePassword);
         ERModelRetriever retrievER = new ERModelRetriever(jdbcConnection.getConnection(), dbDialect);
         retrievER.setFilter(filter);
         List<Table> model = retrievER.getModel(catalog, schema);
@@ -84,19 +87,23 @@ public class DBVisualizer {
     }
 
     private boolean assignCommandLineOptions(CommandLine commandLine) {
-        int mandatoriesAssigned = 3;
+        long mandatoriesAssigned = Arrays.stream(OPTS.values()).filter(o -> o.getOption().isRequired()).count();
+        LOGGER.debug("Number of mandatory arguments: {}", mandatoriesAssigned);
         for (Option option : commandLine.getOptions()) {
+            if (option.isRequired()) {
+                mandatoriesAssigned--;
+            }
             if (option.equals(OPTS.OPT_OUTPUT_FILE.getOption())) {
                 outputFileName = option.getValue();
-                mandatoriesAssigned--;
             }
             if (option.equals(OPTS.OPT_JDBC_DRV.getOption())) {
                 jdbcDriver = option.getValue();
-                mandatoriesAssigned--;
             }
             if (option.equals(OPTS.OPT_JDBC_URL.getOption())) {
                 jdbcUrl = option.getValue();
-                mandatoriesAssigned--;
+            }
+            if (option.equals(OPTS.OPT_JDBC_DRV_PATH.getOption())) {
+                jdbcDriverPath = option.getValue();
             }
             if (option.equals(OPTS.OPT_USER.getOption())) {
                 databaseUser = option.getValue();
@@ -131,7 +138,7 @@ public class DBVisualizer {
                     filter = Pattern.compile(filterString);
                     LOGGER.info("Using filter pattern {}", filterString);
                 } catch (PatternSyntaxException pse) {
-                    LOGGER.warn("Could not parse regular expression '{}' for filtering. Will not apply any filter!");
+                    LOGGER.warn("Could not parse regular expression '{}' for filtering. Will not apply any filter!", filterString);
                 }
             }
             if (option.equals(OPTS.OPT_DIALECT.getOption())) {
@@ -144,7 +151,14 @@ public class DBVisualizer {
                 }
             }
         }
+        LOGGER.debug("Number of mandatory arguments left: {}", mandatoriesAssigned);
         return mandatoriesAssigned == 0;
+    }
+
+    private static void usage() {
+        OPTS.printHelp(
+                "DBVisualizer",
+                "Gets all (matching) tables from given database connection and generates an outputfile in the specified format (default: .dot)");
     }
 
     /**
@@ -158,19 +172,18 @@ public class DBVisualizer {
     public static void main(String[] args) throws ConnectionException, SQLException, IOException {
         CommandLineParser parser = new DefaultParser();
         CommandLine commandLine = null;
+        if (args.length == 0) {
+            usage();
+            System.exit(0);
+        }
         try {
             commandLine = parser.parse(OPTS.getOptions(), args);
         } catch (ParseException p) {
             System.err.println("Could not parse command line. " + p.getMessage());
+            usage();
             System.exit(1);
         }
-        if (commandLine.getOptions().length == 0) {
-            OPTS.printHelp(
-                    "DBVisualizer",
-                    "Gets all (matching) tables from given database connection and generates an outputfile in the specified format (default: .dot)");
-        } else {
-            new DBVisualizer(commandLine);
-        }
+        new DBVisualizer(commandLine);
     }
 
 }
