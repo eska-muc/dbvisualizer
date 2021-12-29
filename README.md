@@ -20,8 +20,6 @@ Start DBVisualizer like this:
 
     java -jar target/dbvisualizer-1-SNAPSHOT-jar-with-dependencies.jar
 
-It is expected, that the JDBS driver's location is specifief in the classpath.
-
 All command line options are listed, like this:
 
     usage: DBVisualizer [-a <arg>] [-c <arg>] [-d <arg>] -driver <arg>
