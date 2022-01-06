@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import com.skuehnel.dbvisualizer.domain.Model;
+import com.skuehnel.dbvisualizer.report.HTMLReport;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -49,6 +51,7 @@ public class DBVisualizer {
     private boolean lROption = false;
     private boolean entitiesOnly = false;
     private Pattern filter;
+    private String reportFile;
 
     /**
      * Default constructor
@@ -73,10 +76,15 @@ public class DBVisualizer {
         JDBCConnection jdbcConnection = new JDBCConnection(jdbcDriver, jdbcDriverPath, jdbcUrl, databaseUser, databasePassword);
         ERModelRetriever retrievER = new ERModelRetriever(jdbcConnection.getConnection(), dbDialect);
         retrievER.setFilter(filter);
-        List<Table> model = retrievER.getModel(catalog, schema);
-        Visualizer visualizer = new Visualizer(model);
+        Model model = retrievER.getModel(catalog, schema);
+        Visualizer visualizer = new Visualizer(model.getTableList());
         visualizer.setLrEnabled(lROption);
         visualizer.setEntitiesOnly(entitiesOnly);
+        // Create an additional HTML report
+        if (reportFile != null) {
+            HTMLReport htmlReport = new HTMLReport();
+            htmlReport.generateReport(reportFile, model);
+        }
         if (outputFormat.equals(FORMAT.DOT)) {
             OutputWriter writer = new OutputWriter(outputFileName, visualizer.getDotRepresentation());
             writer.write();
@@ -140,6 +148,9 @@ public class DBVisualizer {
                 } catch (PatternSyntaxException pse) {
                     LOGGER.warn("Could not parse regular expression '{}' for filtering. Will not apply any filter!", filterString);
                 }
+            }
+            if (option.equals(OPTS.OPT_REPORT_FILE.getOption())) {
+                reportFile = option.getValue();
             }
             if (option.equals(OPTS.OPT_DIALECT.getOption())) {
                 try {

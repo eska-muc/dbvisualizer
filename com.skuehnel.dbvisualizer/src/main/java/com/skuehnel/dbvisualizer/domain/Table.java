@@ -13,6 +13,7 @@ public class Table {
 
 	private String name;
 	private String simpleName;
+	private String comment;
 	private List<Column> columns;
 	
 	private List<Table> foreignKeyRelations;
@@ -96,6 +97,21 @@ public class Table {
 		}
 	}
 
-	
-	
+	/**
+	 * Getter for attribute comment
+	 *
+	 * @return current value of field comment
+	 */
+	public String getComment() {
+		return comment;
+	}
+
+	/**
+	 * Setter for field comment
+	 *
+	 * @param comment new value
+	 */
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
 }
