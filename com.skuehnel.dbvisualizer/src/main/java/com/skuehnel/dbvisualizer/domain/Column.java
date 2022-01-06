@@ -16,6 +16,7 @@ public class Column {
 	private boolean notNull;
 	private Table foreignKeyTable;
 	private Column foreignKeyColumn;
+	private String comment;
 	
 	/**
 	 * Constructor
@@ -140,7 +141,22 @@ public class Column {
 	public void setForeignKeyColumn(Column foreignKeyColumn) {
 		this.foreignKeyColumn = foreignKeyColumn;
 	}
-	
-	
-	
+
+	/**
+	 * Getter for attribute comment
+	 *
+	 * @return current value of field comment
+	 */
+	public String getComment() {
+		return comment;
+	}
+
+	/**
+	 * Setter for field comment
+	 *
+	 * @param comment new value
+	 */
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
 }

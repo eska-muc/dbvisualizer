@@ -43,7 +43,9 @@ public enum OPTS {
 			"Name of the catalog to retrieve tables from. Default: null."),
 	OPT_FILTER("f", "filter", false, true, "Regular expression (Java flavor) which is applied on table names"),
 	OPT_OUTPUT_FILE(
-			"o", "output-file", true, true, "Name of the output file (mandatory).");
+			"o", "output-file", true, true, "Name of the output file (mandatory)."),
+	OPT_REPORT_FILE(
+			"r", "report-file", true, true, "Name of the html report file.");
 
 	private final String shortOpt;
 	private final String longOpt;

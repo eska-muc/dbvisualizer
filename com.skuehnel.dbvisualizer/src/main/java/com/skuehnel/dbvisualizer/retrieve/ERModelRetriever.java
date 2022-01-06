@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.skuehnel.dbvisualizer.domain.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,12 +34,14 @@ public class ERModelRetriever {
     private static final String COLUMN_SIZE = "COLUMN_SIZE";
     private static final String TYPE_NAME = "TYPE_NAME";
     private static final String COLUMN_NAME = "COLUMN_NAME";
+    private static final String COLUMN_REMARKS = "REMARKS";
     private static final String DATA_TYPE = "DATA_TYPE";
     private static final String DECIMAL_DIGITS = "DECIMAL_DIGITS";
     private static final String TABLE_CATALOG = "TABLE_CATALOG";
     private static final String TABLE_SCHEM = "TABLE_SCHEM";
     private static final String TABLE_NAME = "TABLE_NAME";
     private static final String TABLE_TYPE = "TABLE_TYPE";
+    private static final String TABLE_REMARKS = "REMARKS";
     private static final String FKCOLUMN_NAME = "FKCOLUMN_NAME";
     private static final String PKCOLUMN_NAME = "PKCOLUMN_NAME";
     private static final String PKTABLE_CAT = "PKTABLE_CAT";
@@ -76,8 +79,11 @@ public class ERModelRetriever {
      * @return list of table objects
      * @throws SQLException if an error occurs
      */
-    public List<Table> getModel(String catalog, String schema) throws SQLException {
-        List<Table> result = new ArrayList<>();
+    public Model getModel(String catalog, String schema) throws SQLException {
+        Model result = new Model();
+        result.setCatalogName(catalog);
+        result.setSchemaName(schema);
+        List<Table> tables = new ArrayList<>();
         DatabaseMetaData databaseMetaData = jdbcConnection.getMetaData();
         if (databaseMetaData != null) {
 
@@ -99,18 +105,23 @@ public class ERModelRetriever {
                         LOGGER.debug(
                                 "Going to retrieve tables for catalog '{}' and schema '{}'.",
                                 catalog, schema);
+                        result.setSchemaName(currentSchema);
                         List<Table> tablesForSchema = getTables(
                                 databaseMetaData, currentCatalog, currentSchema);
-                        result.addAll(tablesForSchema);
+                        tables.addAll(tablesForSchema);
                     }
                     schemaResultSet.close();
                 }
             } else {
-                result.addAll(getTables(databaseMetaData, catalog, schema));
+                tables.addAll(getTables(databaseMetaData, catalog, schema));
             }
+            result.setDatabaseType(databaseMetaData.getDatabaseProductName() + " " + databaseMetaData.getDatabaseProductVersion());
+
         }
+        result.setTableList(tables);
         return result;
     }
+
 
     /**
      * Setter. Set the filter for table names.
@@ -141,6 +152,7 @@ public class ERModelRetriever {
             while (tablesResultSet.next()) {
                 String tableName = tablesResultSet.getString(TABLE_NAME);
                 String tableType = tablesResultSet.getString(TABLE_TYPE);
+                String tableComment = tablesResultSet.getString(TABLE_REMARKS);
                 if (filter != null && !filter.matcher(tableName).matches()) {
                     LOGGER.debug("Table name {} does not match filter.", tableName);
                     continue;
@@ -151,6 +163,7 @@ public class ERModelRetriever {
                 List<Column> columns = getColumns(databaseMetaData, catalog, schema, tableName, primaryKeyNames, referencedTables);
                 Table t = getTable(catalog, schema, tableName);
                 t.setColumns(columns);
+                t.setComment(tableComment);
                 tablesForSchema.add(t);
             }
             tablesResultSet.close();
@@ -166,12 +179,14 @@ public class ERModelRetriever {
             while (columnResultSet.next()) {
                 String columnName = columnResultSet
                         .getString(COLUMN_NAME);
+                String columnComment = columnResultSet.getString(COLUMN_REMARKS);
                 String dataType = getTypeDescription(columnResultSet);
                 boolean nullable = checkBoolean(columnResultSet,
                         "IS_NULLABLE", "yes");
                 LOGGER.debug("Column: '{}', Type: '{}'", columnName,
                         dataType);
                 Column column = new Column(columnName, dataType);
+                column.setComment(columnComment);
                 column.setNotNull(!nullable);
                 if (primaryKeyNames.contains(columnName)) {
                     LOGGER.debug("Column: '{}' is primary key!",
