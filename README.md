@@ -23,12 +23,10 @@ Start DBVisualizer like this:
 All command line options are listed, like this:
 
     usage: DBVisualizer [-a <arg>] [-c <arg>] [-d <arg>] -driver <arg>
-       [-driverpath <arg>] [-e] [-f <arg>] [-l] -o <arg> [-p <arg>] [-s
-       <arg>] [-t <arg>] [-u <arg>] -url <arg>
-
+       [-driverpath <arg>] [-e] [-f <arg>] [-l] -o <arg> [-p <arg>] -r
+       <arg> [-s <arg>] [-t <arg>] [-u <arg>] -url <arg>
     Gets all (matching) tables from given database connection and generates an
     outputfile in the specified format (default: .dot)
-
     -a,--format <arg>                      Format: DOT (default), PLANT
     -c,--catalog <arg>                     Name of the catalog to retrieve
     tables from. Default: null.
@@ -48,6 +46,7 @@ All command line options are listed, like this:
     -o,--output-file <arg>                 Name of the output file
     (mandatory).
     -p,--password <arg>                    Password for database connection.
+    -r,--report-file <arg>                 Name of the html report file.
     -s,--schema <arg>                      Name of the schema to retrieve
     tables from. Default: all schemas.
     -t,--tables <arg>                      TestDBGenerator only: number of
@@ -82,6 +81,11 @@ With option -a PLANT a text file for [PlantUML](https://plantuml.com/ie-diagram)
 This can be converted into a .pdf file like this (name of the .jar file can be different):
 
     java -jar target/plantuml-1.2021.16-SNAPSHOT-jar-with-dependencies.jar -tpdf <path to output of dbvisualizer>
+
+## Simple HTML Report
+
+With the option -r the name of a single .html file can be specified. In this case a very simple HTML report on the 
+database structure will be generated and written in the specified file.
 
 ## TestDBGenerator
 
