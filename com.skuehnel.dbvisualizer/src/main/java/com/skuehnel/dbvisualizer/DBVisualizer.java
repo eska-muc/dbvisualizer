@@ -3,22 +3,21 @@ package com.skuehnel.dbvisualizer;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import com.skuehnel.dbvisualizer.domain.Model;
-import com.skuehnel.dbvisualizer.report.HTMLReport;
+import com.skuehnel.dbvisualizer.report.HTMLReportGenerator;
+import com.skuehnel.dbvisualizer.report.ReportGenerator;
+import com.skuehnel.dbvisualizer.report.ReportGeneratorFactory;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.skuehnel.dbvisualizer.domain.Table;
 import com.skuehnel.dbvisualizer.retrieve.ConnectionException;
 import com.skuehnel.dbvisualizer.retrieve.JDBCConnection;
 import com.skuehnel.dbvisualizer.retrieve.ERModelRetriever;
@@ -38,6 +37,8 @@ public class DBVisualizer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBVisualizer.class);
 
+    private enum REPORT_FORMAT {HTML, MARKDOWN, PDF}
+
     private String outputFileName;
     private String jdbcDriver;
     private String jdbcUrl;
@@ -52,6 +53,7 @@ public class DBVisualizer {
     private boolean entitiesOnly = false;
     private Pattern filter;
     private String reportFile;
+    private REPORT_FORMAT reportFormat = REPORT_FORMAT.HTML;
 
     /**
      * Default constructor
@@ -80,10 +82,10 @@ public class DBVisualizer {
         Visualizer visualizer = new Visualizer(model.getTableList());
         visualizer.setLrEnabled(lROption);
         visualizer.setEntitiesOnly(entitiesOnly);
-        // Create an additional HTML report
+        // Create an additional report
         if (reportFile != null) {
-            HTMLReport htmlReport = new HTMLReport();
-            htmlReport.generateReport(reportFile, model);
+            ReportGenerator reportGenerator = ReportGeneratorFactory.createReportGeneratorInstance(reportFormat.toString());
+            reportGenerator.generateReport(reportFile, model);
         }
         if (outputFormat.equals(FORMAT.DOT)) {
             OutputWriter writer = new OutputWriter(outputFileName, visualizer.getDotRepresentation());
@@ -151,6 +153,14 @@ public class DBVisualizer {
             }
             if (option.equals(OPTS.OPT_REPORT_FILE.getOption())) {
                 reportFile = option.getValue();
+            }
+            if (option.equals(OPTS.OPT_REPORT_FORMAT.getOption())) {
+                try {
+                    reportFormat = REPORT_FORMAT.valueOf(option.getValue());
+                } catch (IllegalArgumentException illegalArgumentException) {
+                    LOGGER.error("Unsupported Format for reports.", illegalArgumentException);
+                    System.exit(1);
+                }
             }
             if (option.equals(OPTS.OPT_DIALECT.getOption())) {
                 try {

@@ -82,10 +82,15 @@ This can be converted into a .pdf file like this (name of the .jar file can be d
 
     java -jar target/plantuml-1.2021.16-SNAPSHOT-jar-with-dependencies.jar -tpdf <path to output of dbvisualizer>
 
-## Simple HTML Report
+## Reports
 
-With the option -r the name of a single .html file can be specified. In this case a very simple HTML report on the 
-database structure will be generated and written in the specified file.
+Using the option -r with a filename a tabular report on the tables and columns will be written in the specified file.
+Following formats (option -F) are supported:
+* HTML (default)
+* MARKDOWN
+* PDF
+
+For PDF the library [easytable](https://github.com/vandeseer/easytable) is used.
 
 ## TestDBGenerator
 
@@ -111,7 +116,6 @@ Command line options are:
 
 List of some features, which might be added in future:
 
-* generate text reports of the database structure (for documentation purposes)
 * Create a Maven Plugin, so that the Documentation can be easily generated in the build process
 * Check, if [Smetana](https://github.com/plantuml/smetana) could be used as a direct library instead of the GraphViz standalone tools
 * run as REST service and provide a web UI, probably using a JS framework like [visjs.org](http://visjs.org/) or [D3js](https://d3js.org/) for visualization 
