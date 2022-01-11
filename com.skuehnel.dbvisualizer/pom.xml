@@ -44,7 +44,12 @@
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-slf4j-impl</artifactId>
 			<version>${log4j.version}</version>
-		</dependency>		
+		</dependency>
+		<dependency>
+			<groupId>com.github.vandeseer</groupId>
+			<artifactId>easytable</artifactId>
+			<version>0.8.5</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
