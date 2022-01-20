@@ -54,6 +54,7 @@ public class DBVisualizer {
     private Pattern filter;
     private String reportFile;
     private REPORT_FORMAT reportFormat = REPORT_FORMAT.HTML;
+    private boolean reportMeta = false;
 
     /**
      * Default constructor
@@ -79,13 +80,18 @@ public class DBVisualizer {
         ERModelRetriever retrievER = new ERModelRetriever(jdbcConnection.getConnection(), dbDialect);
         retrievER.setFilter(filter);
         Model model = retrievER.getModel(catalog, schema);
+        model.setJdbcURL(jdbcUrl);
+        model.setFilterInfo(filter != null ? filter.toString() : null);
         Visualizer visualizer = new Visualizer(model.getTableList());
         visualizer.setLrEnabled(lROption);
         visualizer.setEntitiesOnly(entitiesOnly);
         // Create an additional report
         if (reportFile != null) {
             ReportGenerator reportGenerator = ReportGeneratorFactory.createReportGeneratorInstance(reportFormat.toString());
-            reportGenerator.generateReport(reportFile, model);
+            if (reportMeta) {
+                reportGenerator.initMetaInformation(model);
+            }
+            reportGenerator.generateReport(reportFile, model, reportMeta ? ReportGenerator.REPORT_OPT.WITH_META_INFORMATION : null);
         }
         if (outputFormat.equals(FORMAT.DOT)) {
             OutputWriter writer = new OutputWriter(outputFileName, visualizer.getDotRepresentation());
@@ -153,6 +159,9 @@ public class DBVisualizer {
             }
             if (option.equals(OPTS.OPT_REPORT_FILE.getOption())) {
                 reportFile = option.getValue();
+            }
+            if (option.equals(OPTS.OPT_REPORT_META.getOption())) {
+                reportMeta = true;
             }
             if (option.equals(OPTS.OPT_REPORT_FORMAT.getOption())) {
                 try {

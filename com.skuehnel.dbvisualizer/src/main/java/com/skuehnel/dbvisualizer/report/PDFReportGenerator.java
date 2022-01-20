@@ -4,7 +4,6 @@ import com.skuehnel.dbvisualizer.domain.Column;
 import com.skuehnel.dbvisualizer.domain.Model;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.slf4j.Logger;
@@ -17,16 +16,21 @@ import org.vandeseer.easytable.structure.Row;
 import org.vandeseer.easytable.structure.Table;
 import org.vandeseer.easytable.structure.cell.TextCell;
 
-import java.awt.*;
 import java.io.IOException;
+import java.awt.Color;
+import java.util.Map;
 
 public class PDFReportGenerator extends AbstractReportGenerator implements ReportGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PDFReportGenerator.class);
 
     @Override
-    public void generateReport(String outputFile, Model model) {
+    public void generateReport(String outputFile, Model model, REPORT_OPT... options) {
         try (final PDDocument document = new PDDocument()) {
+
+            if (checkForOption(options, REPORT_OPT.WITH_META_INFORMATION)) {
+                addMetaPage(document);
+            }
 
             for (com.skuehnel.dbvisualizer.domain.Table databaseTable : model.getTableList()) {
 
@@ -53,6 +57,26 @@ public class PDFReportGenerator extends AbstractReportGenerator implements Repor
         } catch (IOException ioException) {
             LOGGER.error("I/O Exception caught.", ioException);
         }
+    }
+
+    private void addMetaPage(PDDocument document) throws IOException {
+        PDPage page = new PDPage(PDRectangle.A4);
+        float startY = 20;
+        Table.TableBuilder tableBuilder = Table.builder().addColumnsOfWidth(colWidth(page, 40), colWidth(page, 60));
+        Map<String, String> metaInfo = getMetaInformation();
+        for (Map.Entry<String, String> entry : metaInfo.entrySet()) {
+            tableBuilder.addRow(
+                    Row.builder().add(createBodyCell(entry.getKey()))
+                            .add(createBodyCell(nvl(entry.getValue(), "")))
+                            .build()
+            );
+        }
+        TableDrawer drawer = TableDrawer.builder().table(tableBuilder.build())
+                .startX(50)
+                .startY(startY)
+                .endY(200)
+                .build();
+        drawer.draw(() -> document, () -> page, startY);
     }
 
     private Table createPdfTable(PDPage page, com.skuehnel.dbvisualizer.domain.Table table) {
