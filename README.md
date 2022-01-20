@@ -43,6 +43,9 @@ All command line options are listed, like this:
     which is applied on table names
     -l,--enable-lr                         Use GraphViz option ranking=LR;
     Graph layout from left to right.
+    -m,--report-metainformation            Include some meta information
+                                           (e.g. report generation date) in        
+                                           the generated report. 
     -o,--output-file <arg>                 Name of the output file
     (mandatory).
     -p,--password <arg>                    Password for database connection.

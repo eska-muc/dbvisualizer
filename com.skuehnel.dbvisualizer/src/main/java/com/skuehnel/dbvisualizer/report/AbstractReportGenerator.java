@@ -5,11 +5,21 @@ import com.skuehnel.dbvisualizer.domain.Model;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class AbstractReportGenerator {
+public abstract class AbstractReportGenerator implements ReportGenerator {
+
+    private HashMap<String, String> metaInformation = new HashMap<>();
+
+    /**
+     * Helper method to get a textual description of the constraints of an column
+     *
+     * @param c the column object
+     * @return a textual representation of the constraints
+     */
     protected String constraints(Column c) {
         List<String> constraintList = new ArrayList<>();
         if (c != null) {
@@ -26,7 +36,7 @@ public class AbstractReportGenerator {
                 constraintList.add((String.format("FK (table: %s)", c.getForeignKeyTable().getName())));
             }
         }
-        return constraintList.stream().collect(Collectors.joining(", "));
+        return String.join(", ", constraintList);
     }
 
     /**
@@ -51,6 +61,12 @@ public class AbstractReportGenerator {
         return StringUtils.isNotEmpty(in) ? in : replacement;
     }
 
+    /**
+     * The name of the model to be used in the report
+     *
+     * @param model the model
+     * @return either the database name, the catalog name or the schema name
+     */
     protected String getName(Model model) {
         if (model.getDatabaseName() != null) {
             return model.getDatabaseName();
@@ -61,4 +77,37 @@ public class AbstractReportGenerator {
         }
         return "Unknown Table/Schema/Catalog";
     }
+
+    @Override
+    public void initMetaInformation(Model model) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        metaInformation.putIfAbsent("Report generated at", sdf.format(new Date()));
+        metaInformation.putIfAbsent("JDBC URL", nvl(model.getJdbcURL(), ""));
+        metaInformation.putIfAbsent("Database Type", model.getDatabaseType());
+        if (model.getFilterInfo() != null) {
+            metaInformation.putIfAbsent("Filter", model.getFilterInfo());
+        }
+    }
+
+    /**
+     * Getter for attribute metaInformation
+     *
+     * @return current value of field metaInformation
+     */
+    @Override
+    public HashMap<String, String> getMetaInformation() {
+        return metaInformation;
+    }
+
+    /**
+     * Helper to check if a certain option is set
+     *
+     * @param options all options
+     * @param option  the option to check for
+     * @return true, if the option is in the list
+     */
+    protected boolean checkForOption(REPORT_OPT[] options, REPORT_OPT option) {
+        return options != null && Arrays.stream(options).anyMatch(Predicate.isEqual(option));
+    }
+
 }

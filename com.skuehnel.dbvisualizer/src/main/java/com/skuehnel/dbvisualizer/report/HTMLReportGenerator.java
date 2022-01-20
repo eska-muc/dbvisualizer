@@ -8,10 +8,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import com.skuehnel.dbvisualizer.domain.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.commons.text.StringEscapeUtils;
 
 public class HTMLReportGenerator extends AbstractReportGenerator implements ReportGenerator {
 
@@ -59,8 +62,22 @@ public class HTMLReportGenerator extends AbstractReportGenerator implements Repo
         return stringBuilder.toString();
     }
 
+    private String meta(Map<String, String> metainfo) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("    <h2>Meta information</h2>");
+        stringBuilder.append("    <table>\n");
+        for (Map.Entry<String, String> metaEntry : metainfo.entrySet()) {
+            String v = StringEscapeUtils.escapeHtml4(metaEntry.getValue());
+            stringBuilder.append("      <tr>\n");
+            stringBuilder.append(String.format("        <td>%s</td><td>%s</td>\n", metaEntry.getKey(), v));
+            stringBuilder.append("      </tr>\n");
+        }
+        stringBuilder.append("    </table>\n");
+        return stringBuilder.toString();
+    }
+
     @Override
-    public void generateReport(String outputFilePath, Model theModel) {
+    public void generateReport(String outputFilePath, Model theModel, REPORT_OPT... options) {
         LOGGER.debug("Creating HTML report in file {}", outputFilePath);
         File outputFile = new File(outputFilePath);
         FileWriter outputWriter;
@@ -80,6 +97,9 @@ public class HTMLReportGenerator extends AbstractReportGenerator implements Repo
                             "</style>\n"
             )));
             outputWriter.write(String.format("<h1>Report on \"%s\"</h1>\n", getName(theModel)));
+            if (checkForOption(options, REPORT_OPT.WITH_META_INFORMATION)) {
+                outputWriter.write(meta(getMetaInformation()));
+            }
             for (Table t : theModel.getTableList()) {
                 outputWriter.write(table(t));
             }

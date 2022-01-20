@@ -12,6 +12,7 @@ public class Model {
     private String catalogName;
     private String databaseName;
     private String jdbcURL;
+    private String filterInfo;
 
     /**
      * Getter for attribute databaseType
@@ -124,4 +125,23 @@ public class Model {
     public void setTableList(List<Table> tableList) {
         this.tableList = tableList;
     }
+
+    /**
+     * Getter for attribute filterInfo
+     *
+     * @return current value of field filterInfo
+     */
+    public String getFilterInfo() {
+        return filterInfo;
+    }
+
+    /**
+     * Setter for field filterInfo
+     *
+     * @param filterInfo new value
+     */
+    public void setFilterInfo(String filterInfo) {
+        this.filterInfo = filterInfo;
+    }
+
 }
