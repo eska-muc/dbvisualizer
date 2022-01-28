@@ -1,0 +1,33 @@
+@startuml
+'hide the spot
+hide circle
+' comment
+skinparam linetype ortho
+entity "test.address" as test_address {
+  *pk_address_id : int4
+  --
+  street : varchar(80)
+  house_no : varchar(10)
+  city : varchar(80)
+  state_province : varchar(80)
+  postal_code : varchar(20)
+  country : varchar(80)
+}
+
+entity "test.person" as test_person {
+  *pk_person_id : int4
+  --
+  *first_name : varchar(80)
+  *last_name : varchar(80)
+  *date_of_birth : date
+}
+
+entity "test.person_address" as test_person_address {
+  fk_adress_id : int4 <<FK>>
+  fk_person_id : int4 <<FK>>
+}
+
+
+test_person_address }|--|| test_address
+test_person_address }|--|| test_person
+@enduml
