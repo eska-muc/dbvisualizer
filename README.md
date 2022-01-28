@@ -23,37 +23,42 @@ Start DBVisualizer like this:
 All command line options are listed, like this:
 
     usage: DBVisualizer [-a <arg>] [-c <arg>] [-d <arg>] -driver <arg>
-       [-driverpath <arg>] [-e] [-f <arg>] [-l] -o <arg> [-p <arg>] -r
-       <arg> [-s <arg>] [-t <arg>] [-u <arg>] -url <arg>
+       [-driverpath <arg>] [-e] [-f <arg>] [-F <arg>] [-l] [-m] -o <arg>
+       [-p <arg>] -r <arg> [-s <arg>] [-t <arg>] [-u <arg>] -url <arg>
     Gets all (matching) tables from given database connection and generates an
     outputfile in the specified format (default: .dot)
     -a,--format <arg>                      Format: DOT (default), PLANT
     -c,--catalog <arg>                     Name of the catalog to retrieve
-    tables from. Default: null.
+                                           tables from. Default: null.
     -d,--dialect <arg>                     DB dialect. Possible values are
-    PostgreSQL, MySQL, Oracle
+                                           PostgreSQL, MySQL, Oracle
     -driver,--jdbc-driver <arg>            Class name of the JDBC driver
-    (mandatory).
+                                           (mandatory).
     -driverpath,--jdbc-driver-path <arg>   Path to the driver classes. If
-    this option is not specified, the
-    driver is searched in CLASSPATH.
-    -e,--entities-only                     Show entities and relations only
-    in output.
+                                           this option is not specified, the
+                                           driver is searched in CLASSPATH.
+    -e,--entities-only                     Show only entities and relations
+                                           in output (no attributes/columns).
     -f,--filter <arg>                      Regular expression (Java flavor)
-    which is applied on table names
+                                           which is applied on table names
+    -F,--report-format <arg>               Format of the Report file.
+                                           Supported formats are: html, pdf
+                                           and markdown
     -l,--enable-lr                         Use GraphViz option ranking=LR;
-    Graph layout from left to right.
+                                           Graph layout from left to right.
     -m,--report-metainformation            Include some meta information
-                                           (e.g. report generation date) in        
-                                           the generated report. 
+                                           (e.g. report generation date) in
+                                           the generated report.
     -o,--output-file <arg>                 Name of the output file
-    (mandatory).
+                                           (mandatory).
     -p,--password <arg>                    Password for database connection.
-    -r,--report-file <arg>                 Name of the html report file.
+    -r,--report-file <arg>                 Name of the report file. If
+                                           omitted, no report will be
+                                           generated.
     -s,--schema <arg>                      Name of the schema to retrieve
-    tables from. Default: all schemas.
+                                           tables from. Default: all schemas.
     -t,--tables <arg>                      TestDBGenerator only: number of
-    tables.
+                                           tables.
     -u,--user <arg>                        User name for database connection
     -url,--jdbc-url <arg>                  JDBC URL (mandatory).
 
