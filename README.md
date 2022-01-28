@@ -70,7 +70,7 @@ Example (assuming a PostgreSQL database "test" on localhost, port 5432):
     
     java -jar target/dbvisualizer-1-SNAPSHOT-jar-with-dependencies.jar -driverpath ./postgresql-42.3.1.jar -driver org.postgresql.Driver -o postgresql_test.dot -d PostgreSQL -s test -u test -p "test123" -url jdbc:postgresql://localhost:5432/test 
 
-Tip: For very large schemas it might be useful to apply an filter and generate #
+Tip: For very large schemas it might be useful to apply an filter and generate 
 several smaller diagrams instead of one large.
 
 ## Supported Databases
@@ -79,7 +79,7 @@ Tested with PostgreSQL, MySQL and OracleXE 18c.
 
 ## GraphViz
 
-By default the file is in the .dot-format of [GraphViz](http://www.graphviz.org). To generate a .pdf-file just type
+By default the output file is in the .dot-format of [GraphViz](http://www.graphviz.org). To generate a .pdf-file just type
    
     dot -Tpdf -odiagram.pdf <outputfile of DBVisualizer> 
 
@@ -96,7 +96,7 @@ This can be converted into a .pdf file like this (name of the .jar file can be d
 
 ## Reports
 
-Using the option -r with a filename a tabular report on the tables and columns will be written in the specified file.
+Using the option -r with a filename, a tabular report on the tables and columns will be written in the specified file.
 Following formats (option -F) are supported:
 * HTML (default)
 * MARKDOWN
@@ -126,7 +126,7 @@ Command line options are:
      
 ## Ideas for future enhancements
 
-List of some features, which might be added in future:
+List of some features, which might be added in the future:
 
 * Create a Maven Plugin, so that the Documentation can be easily generated in the build process
 * Check, if [Smetana](https://github.com/plantuml/smetana) could be used as a direct library instead of the GraphViz standalone tools
