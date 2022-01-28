@@ -165,7 +165,7 @@ public class DBVisualizer {
             }
             if (option.equals(OPTS.OPT_REPORT_FORMAT.getOption())) {
                 try {
-                    reportFormat = REPORT_FORMAT.valueOf(option.getValue());
+                    reportFormat = REPORT_FORMAT.valueOf(option.getValue().toUpperCase());
                 } catch (IllegalArgumentException illegalArgumentException) {
                     LOGGER.error("Unsupported Format for reports.", illegalArgumentException);
                     System.exit(1);
