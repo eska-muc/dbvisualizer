@@ -2,7 +2,7 @@
 
 This directory contains examples to demonstrate some capabilities of the tool.
 
-## PostgreSQL examples
+## PostgreSQL example
 
 ![ER-Diagram in PNG format](./postgresql_test.png)
 
