@@ -6,6 +6,10 @@ A tool which creates an ER-Diagram as a GraphViz .dot file (or input file for Pl
 
 ![Example (generated with PlantUML)](https://github.com/eska-muc/dbvisualizer/blob/master/com.skuehnel.dbvisualizer/example/postgresql_test.png)
 
+### Examples
+
+[Examples](./com.skuehnel.dbvisualizer/example/README.md)
+
 ## Compilation
 
 Just do
