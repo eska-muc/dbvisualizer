@@ -51,7 +51,7 @@ public class PDFReportGenerator extends AbstractReportGenerator implements Repor
                         .startY(drawer.getFinalY() - 50f)
                         .endY(200)
                         .numberOfRowsToRepeat(1)
-                        .build().draw(() -> document, () -> page, 50f);
+                        .build().draw(() -> document, () -> new PDPage(PDRectangle.A4), 50f);
             }
             document.save(outputFile);
         } catch (IOException ioException) {
