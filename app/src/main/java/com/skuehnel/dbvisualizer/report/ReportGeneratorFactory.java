@@ -1,9 +1,5 @@
 package com.skuehnel.dbvisualizer.report;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-
 /**
  * Factory for different implementations of the report generator
  */

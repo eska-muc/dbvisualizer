@@ -27,7 +27,7 @@ public enum OPTS {
     OPT_ENTITIES_ONLY(
             "e", "entities-only", false, false,
             "Show only entities and relations in output (no attributes/columns)."),
-    OPT_FORMAT("a", "format", false, true, "Format: DOT (default), PLANT"),
+    OPT_FORMAT("a", "format", false, true, "Format: DOT (default), PLANT, PNG, SVG, PDF"),
     OPT_USER(
             "u", "user", false, true, "User name for database connection"),
     OPT_PASSWORD(

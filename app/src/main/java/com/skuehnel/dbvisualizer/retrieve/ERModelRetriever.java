@@ -87,7 +87,7 @@ public class ERModelRetriever {
         DatabaseMetaData databaseMetaData = jdbcConnection.getMetaData();
         if (databaseMetaData != null) {
 
-            if (schema == null) {
+            if (schema == null || dbDialect == DB_DIALECT.H2) {
 
                 ResultSet schemaResultSet = databaseMetaData.getSchemas();
                 if (schemaResultSet != null) {
@@ -104,11 +104,14 @@ public class ERModelRetriever {
                                 .getString(TABLE_SCHEM);
                         LOGGER.debug(
                                 "Going to retrieve tables for catalog '{}' and schema '{}'.",
-                                catalog, schema);
-                        result.setSchemaName(currentSchema);
-                        List<Table> tablesForSchema = getTables(
-                                databaseMetaData, currentCatalog, currentSchema);
-                        tables.addAll(tablesForSchema);
+                                catalog, currentSchema);
+
+                        if (addCurrentSchema(dbDialect, schema, currentSchema)) {
+                            result.setSchemaName(currentSchema);
+                            List<Table> tablesForSchema = getTables(
+                                    databaseMetaData, currentCatalog, currentSchema);
+                            tables.addAll(tablesForSchema);
+                        }
                     }
                     schemaResultSet.close();
                 }
@@ -122,6 +125,13 @@ public class ERModelRetriever {
         return result;
     }
 
+    private boolean addCurrentSchema(DB_DIALECT dialect, String requiredSchema, String currentSchema) {
+        // in H2 all schemas are returned, the rquired one needs to be filtered out
+        if (dialect == DB_DIALECT.H2) {
+            return requiredSchema != null && requiredSchema.equals(currentSchema);
+        }
+        return true;
+    }
 
     /**
      * Setter. Set the filter for table names.
@@ -167,6 +177,8 @@ public class ERModelRetriever {
                 tablesForSchema.add(t);
             }
             tablesResultSet.close();
+        } else {
+            LOGGER.warn("Result Set is empty");
         }
         return tablesForSchema;
     }
