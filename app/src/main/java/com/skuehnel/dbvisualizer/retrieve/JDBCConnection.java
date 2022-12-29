@@ -5,14 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.*;
-import java.util.Arrays;
 import java.util.Properties;
 
 /**
