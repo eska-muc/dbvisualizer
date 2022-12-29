@@ -47,9 +47,9 @@
                 <version>1.0.0-SNAPSHOT</version>
                 <configuration>
                     <!-- PostgreSQL Demo -->
-
-                    <db_user>test</db_user>
-                    <db_password>test123</db_password>
+                    <!--
+                    <db_user>_replace_me_</db_user>
+                    <db_password>_replace_me_</db_password>
                     <driver>org.postgresql.Driver</driver>
                     <jdbcurl>jdbc:postgresql://[::1]:5432/test</jdbcurl>
                     <diagramFile>test-diagram-postgresql.png</diagramFile>
@@ -58,7 +58,7 @@
                     <reportFormat>HTML</reportFormat>
                     <reportMetadata>true</reportMetadata>
                     <schema>test</schema>
-
+                    -->
                     <!-- H2 Demo -->
                     <!--
                     <db_user>test</db_user>
@@ -88,11 +88,16 @@
                         <artifactId>postgresql</artifactId>
                         <version>42.5.1</version>
                     </dependency>
+                    <!--
+                      Please remove comment, whem you want to try this locally
+                    -->
+                    <!--
                     <dependency>
                         <groupId>com.h2database</groupId>
                         <artifactId>h2</artifactId>
                         <version>2.1.214</version>
                     </dependency>
+                    -->
                 </dependencies>
             </plugin>
         </plugins>
