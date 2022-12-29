@@ -8,7 +8,7 @@
 A tool which creates an ER-Diagram as a GraphViz .dot file (or input file for PlantUML) from a database using JDBC
 metadata retrieval.
 
-![Example (generated with PlantUML)](https://github.com/eska-muc/dbvisualizer/blob/master/com.skuehnel.dbvisualizer/example/postgresql_test.png)
+![Example (generated with PlantUML)](https://github.com/eska-muc/dbvisualizer/blob/master/app/example/postgresql_test.png)
 
 ### Latest news
 
@@ -20,7 +20,7 @@ metadata retrieval.
 
 ### Examples
 
-[Examples](./com.skuehnel.dbvisualizer/example/README.md)
+[Examples](./app/example/README.md)
 
 ## Compilation
 
