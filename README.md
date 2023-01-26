@@ -5,7 +5,9 @@
 
 # DBVisualizer
 
-A tool which creates an ER-Diagram as a GraphViz .dot file (or input file for PlantUML) from a database using JDBC
+A tool which creates ER-Diagrams as a PMG, PDF, SVG file or as .dot input file for [GraphViz](https://graphviz.org/)
+or [PlantUML](https://plantuml.com/) and textual reports (in HTML, MARKDOWN or PDF format) about tables and columns from
+a database using JDBC
 metadata retrieval.
 
 ![Example (generated with PlantUML)](https://github.com/eska-muc/dbvisualizer/blob/master/example/postgresql_test.png)
