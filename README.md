@@ -27,16 +27,25 @@ metadata retrieval.
 Just do
 
     mvn clean install
-    
+
 This creates a "fat" .jar with all dependencies using the maven assembly plugin.
 
 ## Start
 
-Start DBVisualizer like this:
+### Maven Plugin
 
-    java -jar target/dbvisualizer-1-SNAPSHOT-jar-with-dependencies.jar
+To use DBVisualizer as a maven plugin, just switch to the directory "plugin-demo", edit the configuration section
+in the pom.xml and run "mvn install".
 
-All command line options are listed, like this:
+[Documentation](./maven-plugin/README.md)
+
+### CLI
+
+Use the command line version of DBVisualizer like this:
+
+    java -jar app/target/dbvisualizer-1.0.0-SNAPSHOT-jar-with-dependencies.jar
+
+All command line options are listed:
 
     usage: DBVisualizer [-a <arg>] [-c <arg>] [-d <arg>] -driver <arg>
        [-driverpath <arg>] [-e] [-f <arg>] [-F <arg>] [-l] [-m] -o <arg>
@@ -89,7 +98,7 @@ several smaller diagrams instead of one large.
 
 ## Supported Databases
 
-Tested with PostgreSQL, MySQL and OracleXE 18c.
+Tested with PostgreSQL,H2, MySQL and OracleXE 18c.
 
 ## PlantUML
 
