@@ -29,6 +29,7 @@ import com.skuehnel.dbvisualizer.retrieve.JDBCConnection;
 import com.skuehnel.dbvisualizer.retrieve.ERModelRetriever;
 import com.skuehnel.dbvisualizer.util.DB_DIALECT;
 import com.skuehnel.dbvisualizer.util.FORMAT;
+import com.skuehnel.dbvisualizer.util.REPORT_FORMAT;
 import com.skuehnel.dbvisualizer.util.OPTS;
 import com.skuehnel.dbvisualizer.visualize.Visualizer;
 
@@ -158,8 +159,6 @@ public class DBVisualizer {
         }
 
     }
-
-    private enum REPORT_FORMAT {HTML, MARKDOWN, PDF}
 
     private String outputFileName;
     private String jdbcDriver;
@@ -561,7 +560,7 @@ public class DBVisualizer {
         }
     }
 
-    private void assignCommandLineOptionsAndConfigurationValues(CommandLine commandLine) throws MissingMandatoryException {
+    void assignCommandLineOptionsAndConfigurationValues(CommandLine commandLine) throws MissingMandatoryException {
         List<Option> optionList = List.of(commandLine.getOptions());
 
         // Check for a configuration file
@@ -709,7 +708,7 @@ public class DBVisualizer {
         return false;
     }
 
-    private Properties readConfig(String configFile) {
+    Properties readConfig(String configFile) {
         Properties properties = new Properties();
         if (StringUtils.isNotEmpty(configFile)) {
             File f = new File(configFile);
