@@ -1,17 +1,20 @@
 package com.skuehnel.dbvisualizer.visualize;
 
-import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import com.skuehnel.dbvisualizer.domain.Column;
 import com.skuehnel.dbvisualizer.domain.Table;
+import com.skuehnel.dbvisualizer.report.ReportGeneratorFactory;
 import com.skuehnel.dbvisualizer.util.InvalidParamException;
 import com.skuehnel.dbvisualizer.util.TestDBGenerator;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 public class VisualizerTest {
@@ -19,8 +22,8 @@ public class VisualizerTest {
 	private static Table employees = new Table("EMPLOYEES");
 	private static Table departments = new Table("DEPARTMENTS");
 	private static TestDBGenerator testDBGenerator = new TestDBGenerator();
-	
-	@BeforeClass
+
+	@BeforeAll
 	public static void setUpTestData() {
 		
 		Column dept_id   = new Column("ID","NUMBER",true,false,false);
@@ -57,7 +60,6 @@ public class VisualizerTest {
 		v.addTable(employees);		
 		String dot = v.getDotRepresentation();		
 		assertNotNull(dot);
-		System.out.println(dot);
 	}
 	
 	@Test
@@ -66,7 +68,6 @@ public class VisualizerTest {
 		Visualizer v = new Visualizer(tables);		
 		String dot = v.getDotRepresentation();		
 		assertNotNull(dot);
-		System.out.println(dot);	
 	}
 	
 	@Test
@@ -75,7 +76,6 @@ public class VisualizerTest {
 		Visualizer v = new Visualizer(tables);		
 		String dot = v.getDotRepresentation();		
 		assertNotNull(dot);
-		System.out.println(dot);	
 	}
 
 	@Test
@@ -85,4 +85,5 @@ public class VisualizerTest {
 		assertEquals("test_abc_123", Visualizer.makeDotName("test$abc_123"));
 		assertEquals("test_abc_123", Visualizer.makeDotName("test.abc_123"));
 	}
+
 }
