@@ -8,7 +8,7 @@ The database structure (and some data) is defined in src/main/resources/init.sql
 The database does just contain three tables:
 
 * EMPLOYEE
-* DEPARMENT
+* DEPARTMENT
 * EMPLOYEE_DEPARTMENT
 
 Please remove the comments in the pom.xml to run the demo locally.
@@ -23,6 +23,12 @@ To try this out run the script postgres_demo.sql to create the demo schema:
     pgsql -U <user> -d <database> --password -f  src/main/resources/postgresql_demo.sql
 
 Then remove the comments in the pom.xml and change username, password and other seetings according to your local setup.
+
+## MySQL Demo
+
+The pom.xml also contains some settings for a typical MySQL database where a database (schema) "mysql-test" and one
+or more tables which names starts with "employee" exists. Please uncomment and adapt this section according to your
+set-up.
 
 ## Execute maven
 
