@@ -1,16 +1,17 @@
 package com.skuehnel.dbvisualizer;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import com.skuehnel.dbvisualizer.domain.Model;
 import com.skuehnel.dbvisualizer.report.ReportGenerator;
 import com.skuehnel.dbvisualizer.report.ReportGeneratorFactory;
+import com.skuehnel.dbvisualizer.util.MissingMandatoryException;
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.SourceStringReader;
@@ -28,6 +29,7 @@ import com.skuehnel.dbvisualizer.retrieve.JDBCConnection;
 import com.skuehnel.dbvisualizer.retrieve.ERModelRetriever;
 import com.skuehnel.dbvisualizer.util.DB_DIALECT;
 import com.skuehnel.dbvisualizer.util.FORMAT;
+import com.skuehnel.dbvisualizer.util.REPORT_FORMAT;
 import com.skuehnel.dbvisualizer.util.OPTS;
 import com.skuehnel.dbvisualizer.visualize.Visualizer;
 
@@ -158,8 +160,6 @@ public class DBVisualizer {
 
     }
 
-    private enum REPORT_FORMAT {HTML, MARKDOWN, PDF}
-
     private String outputFileName;
     private String jdbcDriver;
     private String jdbcUrl;
@@ -167,6 +167,7 @@ public class DBVisualizer {
     private String databaseUser;
     private String databasePassword;
     private String catalog = null;
+    private String configFile = null;
     private String schema;
     private FORMAT outputFormat = FORMAT.DOT;
     private DB_DIALECT dbDialect = DB_DIALECT.MYSQL;
@@ -466,6 +467,24 @@ public class DBVisualizer {
     }
 
     /**
+     * Getter for attribute configFile
+     *
+     * @return current value of field configFile
+     */
+    public String getConfigFile() {
+        return configFile;
+    }
+
+    /**
+     * Setter for field configFile
+     *
+     * @param configFile new value
+     */
+    public void setConfigFile(String configFile) {
+        this.configFile = configFile;
+    }
+
+    /**
      * Default constructor
      */
     public DBVisualizer() {
@@ -479,9 +498,10 @@ public class DBVisualizer {
      * @throws SQLException        if the execution of an SQL command failed
      */
     public DBVisualizer(CommandLine commandline) {
-        if (!assignCommandLineOptions(commandline)) {
-            LOGGER.error("Could not assign all command line options. Maybe a mandatory option was not set.");
-            System.err.println("One or more of the mandatory options (outputFileName, JDBC Driver class, JDBC URL) is missing.");
+        try {
+            assignCommandLineOptionsAndConfigurationValues(commandline);
+        } catch (MissingMandatoryException missingMandatoryException) {
+            LOGGER.error("Mandatory option was not set.", missingMandatoryException);
             System.exit(1);
         }
     }
@@ -540,87 +560,169 @@ public class DBVisualizer {
         }
     }
 
-    private boolean assignCommandLineOptions(CommandLine commandLine) {
-        long mandatoriesAssigned = Arrays.stream(OPTS.values()).filter(o -> o.getOption().isRequired()).count();
-        LOGGER.debug("Number of mandatory arguments: {}", mandatoriesAssigned);
-        for (Option option : commandLine.getOptions()) {
-            if (option.isRequired()) {
-                mandatoriesAssigned--;
-            }
-            if (option.equals(OPTS.OPT_OUTPUT_FILE.getOption())) {
-                outputFileName = option.getValue();
-            }
-            if (option.equals(OPTS.OPT_JDBC_DRV.getOption())) {
-                jdbcDriver = option.getValue();
-            }
-            if (option.equals(OPTS.OPT_JDBC_URL.getOption())) {
-                jdbcUrl = option.getValue();
-            }
-            if (option.equals(OPTS.OPT_JDBC_DRV_PATH.getOption())) {
-                jdbcDriverPath = option.getValue();
-            }
-            if (option.equals(OPTS.OPT_USER.getOption())) {
-                databaseUser = option.getValue();
-            }
-            if (option.equals(OPTS.OPT_PASSWORD.getOption())) {
-                databasePassword = option.getValue();
-            }
-            if (option.equals(OPTS.OPT_ENABLE_LR.getOption())) {
-                lROption = true;
-            }
-            if (option.equals(OPTS.OPT_ENTITIES_ONLY.getOption())) {
-                entitiesOnly = true;
-            }
-            if (option.equals(OPTS.OPT_SCHEMA_NAME.getOption())) {
-                schema = option.getValue();
-            }
-            if (option.equals(OPTS.OPT_CATALOG_NAME.getOption())) {
-                catalog = option.getValue();
-            }
-            if (option.equals(OPTS.OPT_FORMAT.getOption())) {
-                String format = option.getValue();
-                try {
-                    outputFormat = FORMAT.valueOf(format);
-                } catch (IllegalArgumentException e) {
-                    LOGGER.error("Unknown format {}", format);
-                    System.exit(1);
-                }
-            }
-            if (option.equals(OPTS.OPT_FILTER.getOption())) {
-                String filterString = option.getValue();
-                try {
-                    filter = Pattern.compile(filterString);
-                    LOGGER.info("Using filter pattern {}", filterString);
-                } catch (PatternSyntaxException pse) {
-                    LOGGER.warn("Could not parse regular expression '{}' for filtering. Will not apply any filter!", filterString);
-                }
-            }
-            if (option.equals(OPTS.OPT_REPORT_FILE.getOption())) {
-                reportFile = option.getValue();
-            }
-            if (option.equals(OPTS.OPT_REPORT_META.getOption())) {
-                reportMeta = true;
-            }
-            if (option.equals(OPTS.OPT_REPORT_FORMAT.getOption())) {
-                try {
-                    reportFormat = REPORT_FORMAT.valueOf(option.getValue().toUpperCase());
-                } catch (IllegalArgumentException illegalArgumentException) {
-                    LOGGER.error("Unsupported Format for reports.", illegalArgumentException);
-                    System.exit(1);
-                }
-            }
-            if (option.equals(OPTS.OPT_DIALECT.getOption())) {
-                try {
-                    dbDialect = DB_DIALECT.valueOf(option.getValue().toUpperCase());
-                    LOGGER.info("Using {} as DB dialect.", dbDialect.getValue());
-                } catch (IllegalArgumentException | NullPointerException e) {
-                    LOGGER.error("Could not parse '{}' as DB dialect.", option.getValue());
-                    System.exit(1);
-                }
+    void assignCommandLineOptionsAndConfigurationValues(CommandLine commandLine) throws MissingMandatoryException {
+        List<Option> optionList = List.of(commandLine.getOptions());
+
+        // Check for a configuration file
+        Properties properties = null;
+        Option configFileOption = getOptionFromList(OPTS.OPT_CONFIG_FILE, optionList);
+        if (configFileOption != null) {
+            String configFilename = configFileOption.getValue();
+            LOGGER.debug("Config file: {}", configFilename);
+            if (StringUtils.isNotEmpty(configFilename)) {
+                properties = readConfig(configFilename);
             }
         }
-        LOGGER.debug("Number of mandatory arguments left: {}", mandatoriesAssigned);
-        return mandatoriesAssigned == 0;
+
+        for (OPTS option : OPTS.values()) {
+            switch (option) {
+                case OPT_USER:
+                    databaseUser = getValueFromPropertiesOrCli(option, properties, optionList);
+                    break;
+                case OPT_FILTER:
+                    String filterString = getValueFromPropertiesOrCli(option, properties, optionList);
+                    if (StringUtils.isNotEmpty(filterString)) {
+                        try {
+                            filter = Pattern.compile(filterString);
+                            LOGGER.info("Using filter pattern {}", filterString);
+                        } catch (PatternSyntaxException pse) {
+                            LOGGER.warn("Could not parse regular expression '{}' for filtering. Will not apply any filter!",
+                                    filterString);
+                        }
+                    }
+                    break;
+                case OPT_CATALOG_NAME:
+                    catalog = getValueFromPropertiesOrCli(option, properties, optionList);
+                    break;
+                case OPT_ENTITIES_ONLY:
+                    entitiesOnly = getBooleanValueFromPropertiesOrCli(option, properties, optionList);
+                    break;
+                case OPT_FORMAT:
+                    String format = getValueFromPropertiesOrCli(option, properties, optionList);
+                    if (StringUtils.isNotEmpty(format)) {
+                        try {
+                            outputFormat = FORMAT.valueOf(format.toUpperCase());
+                        } catch (IllegalArgumentException e) {
+                            LOGGER.error(String.format("Unknown format %s", format), e);
+                            System.exit(1);
+                        }
+                    }
+                    break;
+                case OPT_PASSWORD:
+                    databasePassword = getValueFromPropertiesOrCli(option, properties, optionList);
+                    break;
+                case OPT_OUTPUT_FILE:
+                    outputFileName = getValueFromPropertiesOrCli(option, properties, optionList);
+                    break;
+                case OPT_REPORT_FILE:
+                    reportFile = getValueFromPropertiesOrCli(option, properties, optionList);
+                    break;
+                case OPT_REPORT_META:
+                    reportMeta = getBooleanValueFromPropertiesOrCli(option, properties, optionList);
+                    break;
+                case OPT_DIALECT:
+                    String dbDialectString = getValueFromPropertiesOrCli(option, properties, optionList);
+                    if (StringUtils.isNotEmpty(dbDialectString)) {
+                        try {
+                            dbDialect = DB_DIALECT.valueOf(dbDialectString.toUpperCase());
+                            LOGGER.info("Using {} as DB dialect.", dbDialect.getValue());
+                        } catch (IllegalArgumentException | NullPointerException e) {
+                            LOGGER.error(String.format("Could not parse '%s' as DB dialect.", dbDialectString), e);
+                            System.exit(1);
+                        }
+                    }
+                    break;
+                case OPT_JDBC_DRV:
+                    jdbcDriver = getValueFromPropertiesOrCli(option, properties, optionList);
+                    break;
+                case OPT_JDBC_DRV_PATH:
+                    jdbcDriverPath = getValueFromPropertiesOrCli(option, properties, optionList);
+                    break;
+                case OPT_JDBC_URL:
+                    jdbcUrl = getValueFromPropertiesOrCli(option, properties, optionList);
+                    break;
+                case OPT_REPORT_FORMAT:
+                    String reportFormatString = getValueFromPropertiesOrCli(option, properties, optionList);
+                    if (StringUtils.isNotEmpty(reportFormatString)) {
+                        try {
+                            reportFormat = REPORT_FORMAT.valueOf(reportFormatString.toUpperCase());
+                        } catch (IllegalArgumentException illegalArgumentException) {
+                            LOGGER.error(String.format("Unsupported Format '%s' for reports.", reportFormatString),
+                                    illegalArgumentException);
+                            System.exit(1);
+                        }
+                    }
+                    break;
+                case OPT_ENABLE_LR:
+                    lROption = getBooleanValueFromPropertiesOrCli(option, properties, optionList);
+                    break;
+                case OPT_SCHEMA_NAME:
+                    schema = getValueFromPropertiesOrCli(option, properties, optionList);
+                    break;
+            }
+        }
+    }
+
+    private Option getOptionFromList(OPTS opt, List<Option> optionList) {
+        return optionList.stream().filter(o -> o.getLongOpt().equals(opt.getOption().getLongOpt())).findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * CLI has priority over properties file
+     *
+     * @param opt        OPTS enum value
+     * @param properties Properties object
+     * @param optList    list of Option objects as parsed by the command line parser
+     * @return value from properties file or command line. Values from command line have priority
+     */
+    private String getValueFromPropertiesOrCli(OPTS opt, Properties properties, List<Option> optList) {
+        Option optionFromCli = getOptionFromList(opt, optList);
+        boolean mandatory = opt.isMandatory();
+        String value = null;
+        if (optionFromCli != null) {
+            value = optionFromCli.getValue();
+        }
+        if (properties != null && properties.containsKey(opt.getPropertyKey()) && StringUtils.isEmpty(value)) {
+            value = properties.getProperty(opt.getPropertyKey());
+        }
+        if (mandatory && value == null) {
+            throw new MissingMandatoryException(String.format(
+                    "Option %s (property %s) is required but neither set in CLI nor in properties",
+                    opt.getOption().getLongOpt(), opt.getPropertyKey()));
+        }
+        return value;
+    }
+
+    private boolean getBooleanValueFromPropertiesOrCli(OPTS opt, Properties properties, List<Option> optList) {
+        Option option = getOptionFromList(opt, optList);
+        if (option != null) {
+            // option set at CLI level
+            return true;
+        } else if (properties != null) {
+            String valueFromProperties = properties.getProperty(opt.getPropertyKey());
+            if (StringUtils.isNotEmpty(valueFromProperties)) {
+                return valueFromProperties.equalsIgnoreCase("true");
+            }
+        }
+        return false;
+    }
+
+    Properties readConfig(String configFile) {
+        Properties properties = new Properties();
+        if (StringUtils.isNotEmpty(configFile)) {
+            File f = new File(configFile);
+            try {
+                FileInputStream fis = new FileInputStream(f);
+                properties.load(fis);
+                LOGGER.debug("Read properties from {}", configFile);
+                fis.close();
+            } catch (IOException ioException) {
+                LOGGER.error("I/O Exception caught", ioException);
+                System.exit(1);
+            }
+        }
+        return properties;
     }
 
     private static void usage() {

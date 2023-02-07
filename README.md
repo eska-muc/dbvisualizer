@@ -5,12 +5,18 @@
 
 # DBVisualizer
 
-A tool which creates an ER-Diagram as a GraphViz .dot file (or input file for PlantUML) from a database using JDBC
+A tool which creates ER-Diagrams as a PNG, PDF, SVG file or as .dot input file for [GraphViz](https://graphviz.org/)
+or [PlantUML](https://plantuml.com/) and textual reports (in HTML, MARKDOWN or PDF format) about tables and columns from
+a database using JDBC
 metadata retrieval.
 
 ![Example (generated with PlantUML)](https://github.com/eska-muc/dbvisualizer/blob/master/example/postgresql_test.png)
 
 ### Latest news
+
+#### 2023-01
+
+* Configuration can be read from a .properties file (new option -C)
 
 #### 2022-12
 
@@ -34,20 +40,52 @@ This creates a "fat" .jar with all dependencies using the maven assembly plugin.
 
 ### Maven Plugin
 
-To use DBVisualizer as a maven plugin, just switch to the directory "plugin-demo", edit the configuration section
+For an example how to use DBVisualizer as a maven plugin, just switch to the directory "plugin-demo", edit the
+configuration section
 in the pom.xml and run "mvn install".
 
 [Documentation](./maven-plugin/README.md)
 
 ### CLI
 
-Use the command line version of DBVisualizer like this:
+For convenience all required options (for the database connection and the output generation) can be configured using a
+.properties file, like this:
+
+    database.dialect=PostgreSQL
+    database.jdbc.url=jdbc:postgresql://[::1]:5432/test
+    database.jdbc.driver.class=org.postgresql.Driver
+    database.jdbc.driver.path=c:/Users/_your_name_/.m2/repository/org/postgresql/postgresql/42.3.3/postgresql-42.3.3.jar
+    output.graphviz.lroption=false
+    output.diagram.entitiesonly=false
+    output.diagram.format=PNG
+    database.user=_replace_with_real_username_
+    database.password=_replace_with_real_password_
+    database.schema=test
+    #not required for PostgreSQL
+    #database.catalog=
+    #database.filter=
+    output.report.format=MARKDOWN
+    output.report.metadata=true
+    output.diagram.filename=postgres_test_with_properties.png
+    output.report.filename=postgres_test_with_properties_report.md
+
+To use such a configuration file, just call
+
+    java -jar app/target/dbvisualizer-1.0.0-SNAPSHOT-jar-with-dependencies.jar -C <path to configuration.properties>
+
+You can also specify some of the options in the configuration file and some at runtime. The options specified via
+command line options will have priority over the values from the properties file.
+
+For example if you specify -a PDF -o test_diagram.pdf when executing DBVisualizer you will get the diagram as .PDF
+even if the value in the properties file for property "output.diagram.format" was set to PNG.
+
+To get a list of all options call DBVisualizer like this:
 
     java -jar app/target/dbvisualizer-1.0.0-SNAPSHOT-jar-with-dependencies.jar
 
 All command line options are listed:
 
-    usage: DBVisualizer [-a <arg>] [-c <arg>] [-d <arg>] -driver <arg>
+    usage: DBVisualizer [-a <arg>] [-C <arg>] [-c <arg>] [-d <arg>] -driver <arg>
        [-driverpath <arg>] [-e] [-f <arg>] [-F <arg>] [-l] [-m] -o <arg>
        [-p <arg>] -r <arg> [-s <arg>] [-t <arg>] [-u <arg>] -url <arg>
     
@@ -57,6 +95,7 @@ All command line options are listed:
                                            SVG, PDF
     -c,--catalog <arg>                     Name of the catalog to retrieve
                                            tables from. Default: null.
+    -C,--config <arg>                      Name of a configuration file.
     -d,--dialect <arg>                     DB dialect. Possible values are
                                            PostgreSQL, MySQL, Oracle
     -driver,--jdbc-driver <arg>            Class name of the JDBC driver
@@ -161,8 +200,6 @@ Command line options are:
 List of some features, which might be added in the future:
 
 * Add more automated tests for different databases
-* Check, if [Smetana](https://github.com/plantuml/smetana) could be used as a direct library instead of the GraphViz
-  standalone tools
 * run as REST service and provide a web UI, probably using a JS framework like [visjs.org](http://visjs.org/)
   or [D3js](https://d3js.org/) for visualization 
 
