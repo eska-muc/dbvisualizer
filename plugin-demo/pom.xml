@@ -74,6 +74,20 @@
                     <schema>PUBLIC</schema>
                     <dialect>H2</dialect>
                     -->
+                    <!-- MySQL Demo -->
+                    <!--
+                    <db_user> _replace_me_ </db_user>
+                    <db_password> _replace_me_ </db_password>
+                    <driver>com.mysql.jdbc.Driver</driver>
+                    <jdbcurl>jdbc:mysql://localhost:3306/mysql-test</jdbcurl>
+                    <diagramFile>mysql-test-diagram.png</diagramFile>
+                    <diagramFormat>PNG</diagramFormat>
+                    <reportFile>mysql-test-report.html</reportFile>
+                    <reportFormat>HTML</reportFormat>
+                    <dialect>MYSQL</dialect>
+                    <schema>mysql-test</schema>
+                    <filter>employee.*</filter>
+                    -->
                 </configuration>
                 <executions>
                     <execution>
@@ -88,6 +102,11 @@
                         <groupId>org.postgresql</groupId>
                         <artifactId>postgresql</artifactId>
                         <version>42.5.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                        <version>8.0.32</version>
                     </dependency>
                     <!--
                       Please remove comment, if you want to try this locally (being aware of the possible risk

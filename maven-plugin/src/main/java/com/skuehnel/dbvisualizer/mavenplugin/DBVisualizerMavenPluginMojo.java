@@ -57,6 +57,9 @@ public class DBVisualizerMavenPluginMojo extends AbstractMojo {
     @Parameter(property = "reportMetadata")
     boolean reportMetadata = false;
 
+    @Parameter(property = "filter")
+    String filter;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
@@ -73,6 +76,7 @@ public class DBVisualizerMavenPluginMojo extends AbstractMojo {
                 .withSchema(schema)
                 .withCatalog(catalog)
                 .withDBDialect(dialect)
+                .withFilter(filter)
                 .build();
         try {
             dbVisualizer.execute();
