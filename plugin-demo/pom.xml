@@ -35,7 +35,7 @@
                             <regex>\\</regex>
                             <replacement>/</replacement>
                             <value>${project.basedir}</value>
-                            <failIfNoMatch>true</failIfNoMatch>
+                            <failIfNoMatch>false</failIfNoMatch>
                         </configuration>
                     </execution>
                 </executions>
