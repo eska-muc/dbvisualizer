@@ -195,6 +195,45 @@ Command line options are:
      -n,--num <arg>    Number of tables to be generated.
      -t,--type <arg>   Type of test file. Either sql or dot.
 
+## Native-image build with GraalVM
+
+If you want to leverage [GraalVM's](https://www.graalvm.org/) capability to build 
+[native-images](https://www.graalvm.org/latest/reference-manual/native-image/), 
+you can do so by following the below steps:
+
+- [Install GraalVM](https://www.graalvm.org/latest/docs/getting-started/#install-graalvm) on your system.
+- [Install the native-image](https://www.graalvm.org/latest/docs/getting-started/#native-image) functionality of `GraalVM`.
+- Depending on your OS, the linker might require `libfreetype.a` during the native-image build of this project;
+  in my case (Ubuntu 20.04) I did it via `sudo apt-get install libfreetype6-dev`.
+- If not already done, clone this project with `git`.
+- Add the driver of the database you want to build this native-image for to the dependency list in `pom.xml`.
+  E.g. for `PostgreSQL` I added:
+  ```
+  <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.3.0</version>
+  </dependency>
+  ```
+- From the root folder of the project build the app as usual with `mvn clean install`
+- Now, we will execute the application as we usually would, but with an agent attached 
+  that collects configurations for the native-image build and puts into the right folder:
+  ```
+  java -agentlib:native-image-agent=config-output-dir=app/src/main/resources/META-INF/native-image -jar app/target/dbvisualizer-app-1.0.0-SNAPSHOT-jar-with-dependencies.jar -driver org.postgresql.Driver -a PLANT -o app/target/postgresql_test.puml -d PostgreSQL -u <USER> -p <PASSWORD> -url <JDBC_URL> -r app/target/postgresql_test.html
+  ```
+  You will be able to see the files in `app/src/main/resources/META-INF/native-image`.
+- We run `mvn clean install` again. The first time we did it was just for being able to 
+  collect the required configurations. Now we build the app including the configurations. 
+- Switch into the target folder: `cd app/target`
+- Next, create the native-image from the jar we just built by executing:
+  ```
+  native-image -jar dbvisualizer-app-1.0.0-SNAPSHOT-jar-with-dependencies.jar
+  ```
+- To finally run the native-image, execute:
+  ```
+  ./dbvisualizer-app-1.0.0-SNAPSHOT-jar-with-dependencies -driver org.postgresql.Driver -a PLANT -o ../postgresql_test.puml -d PostgreSQL -u <USER> -p <PASSWORD> -url <JDBC_URL> -r ../postgresql_test.html
+  ```
+
 ## Ideas for future enhancements
 
 List of some features, which might be added in the future:
