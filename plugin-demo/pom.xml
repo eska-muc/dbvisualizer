@@ -61,7 +61,7 @@
                     <schema>test</schema>
                     -->
                     <!-- H2 Demo -->
-                    <!--
+
                     <db_user>test</db_user>
                     <db_password>test</db_password>
                     <driver>org.h2.Driver</driver>
@@ -73,7 +73,7 @@
                     <catalog>test</catalog>
                     <schema>PUBLIC</schema>
                     <dialect>H2</dialect>
-                    -->
+
                     <!-- MySQL Demo -->
                     <!--
                     <db_user> _replace_me_ </db_user>
@@ -101,24 +101,22 @@
                     <dependency>
                         <groupId>org.postgresql</groupId>
                         <artifactId>postgresql</artifactId>
-                        <version>42.7.2</version>
+                        <version>42.7.4</version>
                     </dependency>
                     <dependency>
                         <groupId>mysql</groupId>
                         <artifactId>mysql-connector-java</artifactId>
-                        <version>8.0.32</version>
+                        <version>8.0.33</version>
                     </dependency>
                     <!--
                       Please remove comment, if you want to try this locally (being aware of the possible risk
                       which was reported as CVE-2022-45868)
                     -->
-                    <!--
                     <dependency>
                         <groupId>com.h2database</groupId>
                         <artifactId>h2</artifactId>
-                        <version>2.1.214</version>
+                        <version>2.3.232</version>
                     </dependency>
-                    -->
                 </dependencies>
             </plugin>
         </plugins>
