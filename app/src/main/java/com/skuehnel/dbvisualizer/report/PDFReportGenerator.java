@@ -5,7 +5,7 @@ import com.skuehnel.dbvisualizer.domain.Model;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vandeseer.easytable.RepeatedHeaderTableDrawer;
@@ -104,7 +104,7 @@ public class PDFReportGenerator extends AbstractReportGenerator implements Repor
 
     private TextCell createHeaderCell(String text) {
         return TextCell.builder()
-                .font(PDType1Font.HELVETICA_BOLD)
+                .font(Standard14Fonts.FontName.HELVETICA_BOLD)
                 .text(text)
                 .horizontalAlignment(HorizontalAlignment.CENTER)
                 .padding(6f)
@@ -115,7 +115,7 @@ public class PDFReportGenerator extends AbstractReportGenerator implements Repor
 
     private TextCell createBodyCell(String text) {
         return TextCell.builder()
-                .font(PDType1Font.HELVETICA)
+                .font(Standard14Fonts.FontName.HELVETICA_BOLD)
                 .text(text)
                 .horizontalAlignment(HorizontalAlignment.LEFT)
                 .verticalAlignment(VerticalAlignment.TOP)
@@ -137,7 +137,7 @@ public class PDFReportGenerator extends AbstractReportGenerator implements Repor
                 .addRow(
                         Row.builder()
                                 .add(TextCell.builder()
-                                        .font(PDType1Font.HELVETICA_BOLD)
+                                        .font(Standard14Fonts.FontName.HELVETICA_BOLD)
                                         .fontSize(20)
                                         .horizontalAlignment(HorizontalAlignment.CENTER)
                                         .text(table.getName()).build())
@@ -146,7 +146,7 @@ public class PDFReportGenerator extends AbstractReportGenerator implements Repor
                 .addRow(
                         Row.builder()
                                 .add(TextCell.builder()
-                                        .font(PDType1Font.HELVETICA)
+                                        .font(Standard14Fonts.FontName.HELVETICA_BOLD)
                                         .fontSize(12)
                                         .horizontalAlignment(HorizontalAlignment.LEFT)
                                         .text(nvl(table.getComment(), "")).build())

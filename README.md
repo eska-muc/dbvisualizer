@@ -14,6 +14,12 @@ metadata retrieval.
 
 ### Latest news
 
+#### 2025-07
+
+* updated dependencies
+* improved output slightly
+* minor changes
+
 #### 2023-01
 
 * Configuration can be read from a .properties file (new option -C)

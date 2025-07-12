@@ -2,7 +2,6 @@ package com.skuehnel.dbvisualizer;
 
 import java.io.*;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
@@ -60,26 +59,31 @@ public class DBVisualizer {
         }
 
         public DBVisualizerBuilder withOutputFileName(String outputFileName) {
+            LOGGER.info("Output file (diagram): {}", outputFileName);
             instance.setOutputFileName(outputFileName);
             return this;
         }
 
         public DBVisualizerBuilder withJdbcDriver(String jdbcDriver) {
+            LOGGER.info("JDBC driver: {}", jdbcDriver);
             instance.setJdbcDriver(jdbcDriver);
             return this;
         }
 
-        public DBVisualizerBuilder withJdbcUrl(String jbdcUrl) {
-            instance.setJdbcUrl(jbdcUrl);
+        public DBVisualizerBuilder withJdbcUrl(String jdbcUrl) {
+            LOGGER.info("JDBC URL: {}", jdbcUrl);
+            instance.setJdbcUrl(jdbcUrl);
             return this;
         }
 
         public DBVisualizerBuilder withCatalog(String catalog) {
+            LOGGER.info("Database catalog: {}", catalog);
             instance.setCatalog(catalog);
             return this;
         }
 
         public DBVisualizerBuilder withDatabaseUser(String databaseUser) {
+            LOGGER.info("Database user: {}", databaseUser);
             instance.setDatabaseUser(databaseUser);
             return this;
         }
@@ -90,6 +94,7 @@ public class DBVisualizer {
         }
 
         public DBVisualizerBuilder withSchema(String schema) {
+            LOGGER.info("Database schema: {}", schema);
             instance.setSchema(schema);
             return this;
         }
@@ -98,6 +103,7 @@ public class DBVisualizer {
             if (StringUtils.isNotEmpty(outputFormat)) {
                 FORMAT format = FORMAT.valueOf(outputFormat.toUpperCase());
                 instance.setOutputFormat(format);
+                LOGGER.info("Output format (diagram) {}", format);
             } else {
                 LOGGER.warn("Ignoring empty output format");
             }
@@ -108,16 +114,7 @@ public class DBVisualizer {
             if (StringUtils.isNotEmpty(dialect)) {
                 DB_DIALECT db_dialect = DB_DIALECT.valueOf(dialect.toUpperCase());
                 instance.setDbDialect(db_dialect);
-            } else {
-                LOGGER.warn("Ignoring empty db dialect");
-            }
-            return this;
-        }
-
-        public DBVisualizerBuilder withDbDialect(String dbDialect) {
-            if (StringUtils.isNotEmpty(dbDialect)) {
-                DB_DIALECT db_dialect = DB_DIALECT.valueOf(dbDialect);
-                instance.setDbDialect(db_dialect);
+                LOGGER.info("DB dialect: {}", db_dialect);
             } else {
                 LOGGER.warn("Ignoring empty db dialect");
             }
@@ -128,6 +125,7 @@ public class DBVisualizer {
             if (StringUtils.isNotEmpty(filter)) {
                 Pattern filterPattern = Pattern.compile(filter);
                 instance.setFilter(filterPattern);
+                LOGGER.info("Filter pattern: {}", filterPattern.pattern());
             } else {
                 LOGGER.warn("Ignoring empty filter");
             }
@@ -135,6 +133,7 @@ public class DBVisualizer {
         }
 
         public DBVisualizerBuilder withReportFile(String reportFile) {
+            LOGGER.info("Report file: {}", reportFile);
             instance.setReportFile(reportFile);
             return this;
         }
@@ -142,6 +141,7 @@ public class DBVisualizer {
         public DBVisualizerBuilder withReportFormat(String reportFormat) {
             if (StringUtils.isNotEmpty(reportFormat)) {
                 REPORT_FORMAT report_format = REPORT_FORMAT.valueOf(reportFormat);
+                LOGGER.info("Report format {}", report_format);
                 instance.setReportFormat(report_format);
             } else {
                 LOGGER.warn("Ignoring empty report format");

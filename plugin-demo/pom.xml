@@ -68,8 +68,8 @@
                     <jdbcurl>jdbc:h2:mem:test;MODE=PostgreSQL;INIT=RUNSCRIPT FROM '${baseDirForH2}/src/main/resources/init.sql';</jdbcurl>
                     <diagramFile>test-diagram.png</diagramFile>
                     <diagramFormat>PNG</diagramFormat>
-                    <reportFile>test-report.html</reportFile>
-                    <reportFormat>HTML</reportFormat>
+                    <reportFile>test-report.pdf</reportFile>
+                    <reportFormat>PDF</reportFormat>
                     <catalog>test</catalog>
                     <schema>PUBLIC</schema>
                     <dialect>H2</dialect>
