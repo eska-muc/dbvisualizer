@@ -6,7 +6,7 @@
         <artifactId>dbvisualizer</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
-    
+
     <artifactId>dbvisualizer-plugin-demo</artifactId>
     <name>DB Visualizer Plugin Demo</name>
 
@@ -14,8 +14,8 @@
     </description>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
     </properties>
 
     <build>

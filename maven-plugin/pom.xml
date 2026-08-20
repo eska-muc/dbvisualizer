@@ -14,8 +14,8 @@
     <description>Maven plugin to create ER-Diagrams as GraphViz files and textual reports from a DB schema</description>
 
     <properties>
-        <maven.compiler.target>11</maven.compiler.target>
-        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
+        <maven.compiler.source>25</maven.compiler.source>
     </properties>
 
     <dependencies>

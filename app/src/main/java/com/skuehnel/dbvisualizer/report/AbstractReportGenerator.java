@@ -6,9 +6,13 @@ import com.skuehnel.dbvisualizer.domain.Model;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.HashMap;
 
 public abstract class AbstractReportGenerator implements ReportGenerator {
 

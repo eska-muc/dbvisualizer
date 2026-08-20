@@ -1,15 +1,23 @@
 package com.skuehnel.dbvisualizer.retrieve;
 
 import org.apache.commons.lang3.StringUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+
 import java.lang.reflect.InvocationTargetException;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.sql.*;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Driver;
+
 import java.util.Properties;
 
 /**
