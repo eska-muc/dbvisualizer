@@ -14,6 +14,10 @@ metadata retrieval.
 
 ### Latest news
 
+#### 2026-08
+
+* updated dependencies
+
 #### 2025-07
 
 * updated dependencies
